@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:CrossoutLogView.GUI.Controls"
              xmlns:helpers="clr-namespace:CrossoutLogView.GUI.Helpers"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-             xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
              BorderThickness="0"
              d:DesignHeight="450"
@@ -53,7 +52,7 @@
                 <local:PlayerGamesDataGrid />
             </local:ScrollableHeaderedControl.Content>
         </local:ScrollableHeaderedControl>
-        
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

@@ -1,12 +1,21 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class PlayerLoad : ILogEntry
     {
-        public PlayerLoad(long timeStamp, byte playerNumber, int userID, int partyID, string playerNickName, byte team, bool isBot, int uR, int matchMakerHash)
+        public bool IsBot;
+        public int MatchMakerHash;
+        public int PartyID;
+        public string PlayerNickName;
+        public byte PlayerNumber;
+        public byte Team;
+        public int UR;
+        public int UserID;
+
+        public PlayerLoad(long timeStamp, byte playerNumber, int userID, int partyID, string playerNickName, byte team,
+            bool isBot, int uR, int matchMakerHash)
         {
             TimeStamp = timeStamp;
             PlayerNumber = playerNumber;
@@ -19,17 +28,11 @@ namespace CrossoutLogView.Log
             MatchMakerHash = matchMakerHash;
         }
 
-        public PlayerLoad() { }
+        public PlayerLoad()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public byte PlayerNumber;
-        public int UserID;
-        public int PartyID;
-        public string PlayerNickName;
-        public byte Team;
-        public bool IsBot;
-        public int UR;
-        public int MatchMakerHash;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out PlayerLoad deserialized)
         {
@@ -53,7 +56,8 @@ namespace CrossoutLogView.Log
             parser.End(logLine);
             var mmHash = parser.CurrentHex;
             var timeStamp = TimeConverter.FromString(logLine, logDate);
-            deserialized = new PlayerLoad(timeStamp, playerNumber, userID, partyID, playerNickname, team, isBot, ur, mmHash);
+            deserialized = new PlayerLoad(timeStamp, playerNumber, userID, partyID, playerNickname, team, isBot, ur,
+                mmHash);
             return true;
         }
     }

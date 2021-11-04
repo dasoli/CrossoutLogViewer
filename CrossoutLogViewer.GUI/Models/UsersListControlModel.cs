@@ -1,30 +1,33 @@
-﻿using CrossoutLogView.GUI.Core;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
+using CrossoutLogView.GUI.Core;
 
 namespace CrossoutLogView.GUI.Models
 {
     public class UsersListControlModel : ViewModelBase
     {
-        private string _userName;
         private string[] _filtersUserName;
+        private string _userName;
 
-        public string FilterUserName { 
-            get => _userName; 
+        public string FilterUserName
+        {
+            get => _userName;
             set
             {
                 var val = value?.TrimStart();
-                if (String.IsNullOrWhiteSpace(val))
+                if (string.IsNullOrWhiteSpace(val))
                     FiltersUserName = Array.Empty<string>();
                 else
-                    FiltersUserName = val.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).Select(x => x.Trim()).ToArray();
+                    FiltersUserName = val.Split('|').Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim())
+                        .ToArray();
                 Set(ref _userName, val);
             }
         }
 
-        public string[] FiltersUserName { get => _filtersUserName; set => Set(ref _filtersUserName, value); }
+        public string[] FiltersUserName
+        {
+            get => _filtersUserName;
+            set => Set(ref _filtersUserName, value);
+        }
     }
 }

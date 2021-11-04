@@ -1,9 +1,7 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Log;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-
+using CrossoutLogView.Common;
+using CrossoutLogView.Log;
 using static CrossoutLogView.Common.Strings;
 
 namespace CrossoutLogView.Statistics
@@ -12,7 +10,7 @@ namespace CrossoutLogView.Statistics
     {
         public int Uses;
 
-        public Weapon() : base()
+        public Weapon()
         {
         }
 
@@ -24,9 +22,15 @@ namespace CrossoutLogView.Statistics
             Uses = 1;
         }
 
-        public Weapon(string name, double criticalDamage, double armorDamage, int uses) : this(name, criticalDamage, armorDamage)
+        public Weapon(string name, double criticalDamage, double armorDamage, int uses) : this(name, criticalDamage,
+            armorDamage)
         {
             Uses = uses;
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         public Weapon Merge(Weapon other)
@@ -57,19 +61,28 @@ namespace CrossoutLogView.Statistics
                     armorDamage = dmg.DamageAmmount;
                 }
 
-                if (weapon == null) weapons.Add(new Weapon(weaponName, criticalDamage, armorDamage));
+                if (weapon == null)
+                {
+                    weapons.Add(new Weapon(weaponName, criticalDamage, armorDamage));
+                }
                 else
                 {
                     weapon.CriticalDamage += criticalDamage;
                     weapon.ArmorDamage += armorDamage;
                 }
             }
+
             return weapons;
         }
 
-        public Weapon Clone() => new Weapon(Name, CriticalDamage, ArmorDamage);
-        object ICloneable.Clone() => Clone();
+        public Weapon Clone()
+        {
+            return new Weapon(Name, CriticalDamage, ArmorDamage);
+        }
 
-        public override string ToString() => String.Concat(nameof(Weapon), " ", Name, " ", ArmorDamage + CriticalDamage, " ", Uses);
+        public override string ToString()
+        {
+            return string.Concat(nameof(Weapon), " ", Name, " ", ArmorDamage + CriticalDamage, " ", Uses);
+        }
     }
 }

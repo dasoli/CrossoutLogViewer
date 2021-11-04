@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Markup;
-using System.Windows.Media;
+﻿using System.Windows;
 
 namespace CrossoutLogView.GUI.Helpers
 {
     public class BindingProxy : Freezable
     {
-        public BindingProxy() { }
+        public BindingProxy()
+        {
+        }
+
         public BindingProxy(object value)
-            => Value = value;
+        {
+            Value = value;
+        }
 
         protected override Freezable CreateInstanceCore()
-            => new BindingProxy();
+        {
+            return new BindingProxy();
+        }
 
         #region Value Property
 

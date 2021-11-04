@@ -21,7 +21,8 @@ namespace CrossoutLogView.Statistics
         {
         }
 
-        public PlayerNotFoundException(string message, string paramName, Exception innerException) : base(message, paramName, innerException)
+        public PlayerNotFoundException(string message, string paramName, Exception innerException) : base(message,
+            paramName, innerException)
         {
         }
 
@@ -48,7 +49,8 @@ namespace CrossoutLogView.Statistics
         {
         }
 
-        public UserNotFoundException(string message, string paramName, Exception innerException) : base(message, paramName, innerException)
+        public UserNotFoundException(string message, string paramName, Exception innerException) : base(message,
+            paramName, innerException)
         {
         }
 
@@ -75,7 +77,8 @@ namespace CrossoutLogView.Statistics
         {
         }
 
-        public WeaponNotFoundException(string message, string paramName, Exception innerException) : base(message, paramName, innerException)
+        public WeaponNotFoundException(string message, string paramName, Exception innerException) : base(message,
+            paramName, innerException)
         {
         }
 
@@ -94,7 +97,8 @@ namespace CrossoutLogView.Statistics
         {
         }
 
-        public MatchingLogEntryNotFoundException(string message, Exception innerException) : base(message, innerException)
+        public MatchingLogEntryNotFoundException(string message, Exception innerException) : base(message,
+            innerException)
         {
         }
 
@@ -102,11 +106,13 @@ namespace CrossoutLogView.Statistics
         {
         }
 
-        public MatchingLogEntryNotFoundException(string message, string paramName, Exception innerException) : base(message, paramName, innerException)
+        public MatchingLogEntryNotFoundException(string message, string paramName, Exception innerException) : base(
+            message, paramName, innerException)
         {
         }
 
-        protected MatchingLogEntryNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected MatchingLogEntryNotFoundException(SerializationInfo info, StreamingContext context) : base(info,
+            context)
         {
         }
     }

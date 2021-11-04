@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CrossoutLogView.GUI.Helpers
 {
     public enum DisplayMode
     {
-        [Display(Name = "Avg. Game")]
-        GameAvg,
-        [Display(Name = "Avg. Round")]
-        RoundAvg,
-        [Display(Name = "Total")]
-        Total
+        [Display(Name = "Avg. Game")] GameAvg,
+        [Display(Name = "Avg. Round")] RoundAvg,
+        [Display(Name = "Total")] Total
     }
 }

@@ -1,12 +1,18 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class GameRound : ILogEntry
     {
-        public GameRound(long timeStamp, byte roundNumber, string finishReason, byte team, string winReason, double roundDuration)
+        public string FinishReason;
+        public double RoundDuration;
+        public byte RoundNumber;
+        public byte Team;
+        public string WinReason;
+
+        public GameRound(long timeStamp, byte roundNumber, string finishReason, byte team, string winReason,
+            double roundDuration)
         {
             TimeStamp = timeStamp;
             RoundNumber = roundNumber;
@@ -16,14 +22,11 @@ namespace CrossoutLogView.Log
             RoundDuration = roundDuration;
         }
 
-        public GameRound() { }
+        public GameRound()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public byte RoundNumber;
-        public string FinishReason;
-        public byte Team;
-        public string WinReason;
-        public double RoundDuration;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out GameRound deserialized)
         {

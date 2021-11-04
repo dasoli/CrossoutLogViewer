@@ -1,11 +1,14 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class GameFinish : ILogEntry
     {
+        public double GameDuration;
+        public string GameFinishReason;
+        public byte Team;
+        public string WinReason;
 
         public GameFinish(long timeStamp, string gameFinishReason, byte team, string winReason, double gameDuration)
         {
@@ -16,13 +19,11 @@ namespace CrossoutLogView.Log
             GameDuration = gameDuration;
         }
 
-        public GameFinish() { }
+        public GameFinish()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string GameFinishReason;
-        public byte Team;
-        public string WinReason;
-        public double GameDuration;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out GameFinish deserialized)
         {

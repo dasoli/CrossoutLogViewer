@@ -1,10 +1,8 @@
-﻿using CrossoutLogView.Common;
-
-using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using CrossoutLogView.Common;
+using Newtonsoft.Json;
 
 namespace CrossoutLogView.Database.Data
 {
@@ -26,7 +24,7 @@ namespace CrossoutLogView.Database.Data
             "Wheel_",
             "Gun_",
             "Cabin_",
-            "Structure_",
+            "Structure_"
         };
 
         public static string AssetName(string name)
@@ -36,14 +34,13 @@ namespace CrossoutLogView.Database.Data
                 assets = defaultAssets;
                 WriteDictionary(assets, nameof(assets));
             }
+
             if (assets.TryGetValue(name, out var result)) return result;
             //default behaviour
             var trimmed = name.AsSpan();
             foreach (var prefix in assetNamePrefixes)
-            {
                 if (trimmed.StartsWith(prefix))
                     trimmed = trimmed.Slice(prefix.Length);
-            }
             return trimmed.ToString();
         }
 
@@ -54,10 +51,11 @@ namespace CrossoutLogView.Database.Data
                 stripes = defaultStripes;
                 WriteDictionary(stripes, nameof(stripes));
             }
+
             if (stripes.TryGetValue(name, out var result)) return result;
             //default behaviour
-            if (name.StartsWith("Pvp") || name.StartsWith("Pve")) return name[3..^0];
-            else return name;
+            if (name.StartsWith("Pvp") || name.StartsWith("Pve")) return name[3..];
+            return name;
         }
 
         public static string MapName(string name)
@@ -67,6 +65,7 @@ namespace CrossoutLogView.Database.Data
                 maps = defaultMaps;
                 WriteDictionary(maps, nameof(maps));
             }
+
             if (maps.TryGetValue(name, out var result)) return result;
             return name;
         }
@@ -74,7 +73,9 @@ namespace CrossoutLogView.Database.Data
         private static bool ReadDictionary(ref Dictionary<string, string> dictionary, string name)
         {
             var filePath = Path.Combine(Strings.ConfigPath, name + ".json");
-            if (File.Exists(filePath) && (dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(filePath))) != null) return true;
+            if (File.Exists(filePath) &&
+                (dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(filePath))) !=
+                null) return true;
             return false;
         }
 

@@ -13,8 +13,8 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Loaded="UserControl_Loaded">
     <Grid Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
-        <local:SessionMonth x:Name="SelectedMonth" 
-                            SessionClick="SelectedMonth_SessionClickEvent"/>
+        <local:SessionMonth x:Name="SelectedMonth"
+                            SessionClick="SelectedMonth_SessionClickEvent" />
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top">

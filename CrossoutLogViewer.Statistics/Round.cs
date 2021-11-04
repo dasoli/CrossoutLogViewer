@@ -1,18 +1,17 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Log;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CrossoutLogView.Common;
+using CrossoutLogView.Log;
 
 namespace CrossoutLogView.Statistics
 {
     public class Round : IStatisticData
     {
-        public DateTime Start;
         public DateTime End;
-        public byte Winner;
         public List<Kill> Kills;
+        public DateTime Start;
+        public byte Winner;
 
         public Round()
         {
@@ -33,7 +32,7 @@ namespace CrossoutLogView.Statistics
         {
             var dateTime = new DateTime(kill.TimeStamp);
             if (Start > dateTime || dateTime > End) return false;
-            double killTime = (dateTime - Start).TotalSeconds;
+            var killTime = (dateTime - Start).TotalSeconds;
             var assists = new List<Assist>();
             foreach (var ka in killAssists)
             {
@@ -46,8 +45,10 @@ namespace CrossoutLogView.Statistics
                     var armorDamage = ka.IsCriticalDamage ? ka.TotalDamage : 0.0;
                     weapon = new Weapon(weaponName, criticalDamage, armorDamage);
                 }
+
                 assists.Add(new Assist(ka.Assistant, weapon, ka.Elapsed, ka.TotalDamage, ka.DamageFlags));
             }
+
             Kills.Add(new Kill(killTime, kill.Killer, kill.Victim, assists));
             return true;
         }
@@ -56,10 +57,13 @@ namespace CrossoutLogView.Statistics
         {
             var rounds = new List<Round>();
             var gameRounds = gameLog
-                    .Where(x => x is GameRound && x.TimeStamp > parent.Start.Ticks && x.TimeStamp < parent.End.Ticks)
-                    .Cast<GameRound>()
-                    .OrderBy(x => x.RoundNumber);
-            if (gameRounds.Count() == 0) rounds.Add(new Round(parent.Start, parent.End, parent.WinningTeam, new List<Kill>()));
+                .Where(x => x is GameRound && x.TimeStamp > parent.Start.Ticks && x.TimeStamp < parent.End.Ticks)
+                .Cast<GameRound>()
+                .OrderBy(x => x.RoundNumber);
+            if (gameRounds.Count() == 0)
+            {
+                rounds.Add(new Round(parent.Start, parent.End, parent.WinningTeam, new List<Kill>()));
+            }
             else
             {
                 var previousStart = parent.Start;
@@ -72,22 +76,25 @@ namespace CrossoutLogView.Statistics
                         new List<Kill>()));
                     previousStart = thisStart;
                 }
+
                 rounds.Add(new Round(previousStart, parent.End, parent.WinningTeam, new List<Kill>()));
             }
+
             var kills = gameLog.Where(x => x is Killing).Cast<Killing>();
             var assists = gameLog.Where(x => x is KillAssist).Cast<KillAssist>().GroupBy(x => x.TimeStamp);
             foreach (var assistKillGroup in assists)
             {
                 var kill = kills.FirstOrDefault(x => x.TimeStamp == assistKillGroup.Key);
                 if (kill == null) continue;
-                foreach (var r in rounds)
-                {
-                    r.TryAddKill(parent, kill, assistKillGroup);
-                }
+                foreach (var r in rounds) r.TryAddKill(parent, kill, assistKillGroup);
             }
+
             return rounds;
         }
 
-        public override string ToString() => String.Concat(nameof(Round), " ", Start, " ", End, " ", Kills?.Count);
+        public override string ToString()
+        {
+            return string.Concat(nameof(Round), " ", Start, " ", End, " ", Kills?.Count);
+        }
     }
 }

@@ -1,11 +1,12 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class GameStart : ILogEntry
     {
+        public string GameMode;
+        public string MapDisplayName;
 
         public GameStart(long timeStamp, string gameMode, string mapDisplayName)
         {
@@ -14,11 +15,11 @@ namespace CrossoutLogView.Log
             MapDisplayName = mapDisplayName;
         }
 
-        public GameStart() { }
+        public GameStart()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string GameMode;
-        public string MapDisplayName;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out GameStart deserialized)
         {
@@ -29,7 +30,8 @@ namespace CrossoutLogView.Log
             if (!parser.MoveNext(logLine, "' started, map '")) return false;
             var gameMode = parser.CurrentString;
             if (!parser.MoveNext(logLine, "'")) return false;
-            var mapDisplayName = parser.CurrentString; var timeStamp = TimeConverter.FromString(logLine, logDate);
+            var mapDisplayName = parser.CurrentString;
+            var timeStamp = TimeConverter.FromString(logLine, logDate);
             deserialized = new GameStart(timeStamp, gameMode, mapDisplayName);
             return true;
         }

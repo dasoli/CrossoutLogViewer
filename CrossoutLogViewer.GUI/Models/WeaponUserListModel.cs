@@ -1,12 +1,8 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Linq;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CrossoutLogView.GUI.Models
 {
@@ -30,11 +26,27 @@ namespace CrossoutLogView.GUI.Models
 
         public string UserName => User.Name;
 
-        public double ArmorDamage { get => _armorDamage; set { Set(ref _armorDamage, value); OnPropertyChanged(nameof(TotalDamage)); } }
+        public double ArmorDamage
+        {
+            get => _armorDamage;
+            set
+            {
+                Set(ref _armorDamage, value);
+                OnPropertyChanged(nameof(TotalDamage));
+            }
+        }
 
-        public double CriticalDamage { get => _critcalDamage; set { Set(ref _critcalDamage, value); OnPropertyChanged(nameof(TotalDamage)); } }
+        public double CriticalDamage
+        {
+            get => _critcalDamage;
+            set
+            {
+                Set(ref _critcalDamage, value);
+                OnPropertyChanged(nameof(TotalDamage));
+            }
+        }
 
-        public double TotalDamage { get => _armorDamage + _critcalDamage; }
+        public double TotalDamage => _armorDamage + _critcalDamage;
 
         private void UpdateDamageData()
         {
@@ -49,11 +61,14 @@ namespace CrossoutLogView.GUI.Models
                     _armorDamage += weapon.ArmorDamage;
                     _critcalDamage += weapon.CriticalDamage;
                 }
+
                 OnPropertyChanged(nameof(ArmorDamage));
                 OnPropertyChanged(nameof(CriticalDamage));
                 OnPropertyChanged(nameof(TotalDamage));
             }
-            catch (InvalidOperationException) { } // Collection was modified exception, thrown when quickly successively selecting elements
+            catch (InvalidOperationException)
+            {
+            } // Collection was modified exception, thrown when quickly successively selecting elements
         }
     }
 }

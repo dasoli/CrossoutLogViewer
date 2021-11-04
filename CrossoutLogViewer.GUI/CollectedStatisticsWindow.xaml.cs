@@ -1,35 +1,28 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Data;
+using CrossoutLogView.Common;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.Database.Events;
-using CrossoutLogView.GUI.Controls;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.GUI.WindowsAuxilary;
-
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
+using NLog;
 
 namespace CrossoutLogView.GUI
 {
     /// <summary>
-    /// Interaction logic for CollectedStatisticsWindow.xaml
+    ///     Interaction logic for CollectedStatisticsWindow.xaml
     /// </summary>
     public partial class CollectedStatisticsWindow : MetroWindow, ILogging
     {
-        private LoadingWindow loadingWindow;
-        private bool forceClose = false;
+        private bool forceClose;
+        private readonly LoadingWindow loadingWindow;
 
         private CollectedStatisticsWindowViewModel viewModel;
 
@@ -79,7 +72,7 @@ namespace CrossoutLogView.GUI
 
             CollectedStatisticsWindowViewModel.InvalidatedCachedData += OnInvalidateCachedData;
 
-            Title = String.Concat(App.GetWindowResource("Stat_Title"), " (", viewModel.MeUser?.User?.Name ?? "", ")");
+            Title = string.Concat(App.GetWindowResource("Stat_Title"), " (", viewModel.MeUser?.User?.Name ?? "", ")");
             HamburgerMenuControl.Focus();
 
             IsEnabled = true;
@@ -97,17 +90,58 @@ namespace CrossoutLogView.GUI
             });
         }
 
+        private void HamburgerMenuControl_ItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs args)
+        {
+            if (args.InvokedItem == MenuGlyphItemSettings)
+            {
+                SyncedFactory.StartNew(new SettingsWindow().ShowDialog);
+                HamburgerMenuControl.SelectedIndex = ContentTabControl.SelectedIndex;
+                args.Handled = true;
+            }
+            else
+            {
+                ContentTabControl.SelectedIndex = HamburgerMenuControl.SelectedIndex;
+                HamburgerMenuControl.IsPaneOpen = false;
+            }
+        }
+
+        private void CloseHamburgerMenuPane(object sender, RoutedEventArgs e)
+        {
+            HamburgerMenuControl.IsPaneOpen = false;
+        }
+
+        private void GamesOpenGame(object sender, OpenModelViewerEventArgs e)
+        {
+            if (e.ViewModel is PlayerGameModel pgc)
+                new NavigationWindow(pgc.Game).Show();
+            else if (e.ViewModel is UserListModel ul) new NavigationWindow(ul).Show();
+        }
+
+        private void UserOpenUser(object sender, OpenModelViewerEventArgs e)
+        {
+            if (e.ViewModel is UserModel user) new NavigationWindow(new UserModel(user.User)).Show();
+        }
+
+        private void WeaponOpenUser(object sender, OpenModelViewerEventArgs e)
+        {
+            if (e.ViewModel is UserModel weapon) new NavigationWindow(weapon).Show();
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (IsLoaded)
+                Settings.Current.StartupMaximized = WindowState == WindowState.Maximized;
+        }
+
         #region Confim close
+
         protected override void OnClosing(CancelEventArgs e)
         {
             if (e.Cancel) return;
             if (!forceClose)
             {
                 e.Cancel = true;
-                Dispatcher.BeginInvoke(new Action(async delegate
-                {
-                    await ConfirmClose().ConfigureAwait(false);
-                }));
+                Dispatcher.BeginInvoke(new Action(async delegate { await ConfirmClose().ConfigureAwait(false); }));
             }
             else
             {
@@ -135,10 +169,7 @@ namespace CrossoutLogView.GUI
             switch (result)
             {
                 case MessageDialogResult.Affirmative:
-                    await Dispatcher.BeginInvoke(new Action(delegate
-                    {
-                        new LauncherWindow().Show();
-                    }));
+                    await Dispatcher.BeginInvoke(new Action(delegate { new LauncherWindow().Show(); }));
                     forceClose = true;
                     break;
                 case MessageDialogResult.FirstAuxiliary:
@@ -148,67 +179,17 @@ namespace CrossoutLogView.GUI
                     forceClose = true;
                     break;
             }
+
             if (forceClose) Close();
         }
+
         #endregion
 
-        private void HamburgerMenuControl_ItemInvoked(object sender, HamburgerMenuItemInvokedEventArgs args)
-        {
-            if (args.InvokedItem == MenuGlyphItemSettings)
-            {
-                SyncedFactory.StartNew(new SettingsWindow().ShowDialog);
-                HamburgerMenuControl.SelectedIndex = ContentTabControl.SelectedIndex;
-                args.Handled = true;
-            }
-            else
-            {
-                ContentTabControl.SelectedIndex = HamburgerMenuControl.SelectedIndex;
-                HamburgerMenuControl.IsPaneOpen = false;
-            }
-        }
-
-        private void CloseHamburgerMenuPane(object sender, RoutedEventArgs e)
-        {
-            HamburgerMenuControl.IsPaneOpen = false;
-        }
-
-        private void GamesOpenGame(object sender, OpenModelViewerEventArgs e)
-        {
-            if (e.ViewModel is PlayerGameModel pgc)
-            {
-                new NavigationWindow(pgc.Game).Show();
-            }
-            else if (e.ViewModel is UserListModel ul)
-            {
-                new NavigationWindow(ul).Show();
-            }
-        }
-
-        private void UserOpenUser(object sender, OpenModelViewerEventArgs e)
-        {
-            if (e.ViewModel is UserModel user)
-            {
-                new NavigationWindow(new UserModel(user.User)).Show();
-            }
-        }
-
-        private void WeaponOpenUser(object sender, OpenModelViewerEventArgs e)
-        {
-            if (e.ViewModel is UserModel weapon)
-            {
-                new NavigationWindow(weapon).Show();
-            }
-        }
-
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            if (IsLoaded)
-                Settings.Current.StartupMaximized = WindowState == WindowState.Maximized;
-        }
-
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

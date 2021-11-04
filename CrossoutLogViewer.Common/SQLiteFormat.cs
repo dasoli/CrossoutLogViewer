@@ -23,26 +23,26 @@ namespace CrossoutLogView.Common
         public static string SQLiteType(Type type)
         {
             return type == null
-                ? String.Empty
+                ? string.Empty
                 : Types.IsGenericIEnumerable(type)
-                ? "TEXT NULL"
-                : type.IsEnum
-                ? "INT DEFAULT 0"
-                : type == typeof(string)
-                ? "TEXT NULL"
-                : type == typeof(float)
-                ? "FLOAT DEFAULT 0"
-                : type == typeof(double)
-                ? "DOUBLE DEFAULT 0"
-                : type == typeof(long) || type == typeof(DateTime)
-                ? "BIGINT DEFAULT 0"
-                : type == typeof(int)
-                ? "INT DEFAULT 0"
-                : type == typeof(short)
-                ? "SMALLINT DEFAULT 0"
-                : type == typeof(bool) || type == typeof(byte)
-                ? "TINYINT DEFAULT 0"
-                : "BLOB NULL";
+                    ? "TEXT NULL"
+                    : type.IsEnum
+                        ? "INT DEFAULT 0"
+                        : type == typeof(string)
+                            ? "TEXT NULL"
+                            : type == typeof(float)
+                                ? "FLOAT DEFAULT 0"
+                                : type == typeof(double)
+                                    ? "DOUBLE DEFAULT 0"
+                                    : type == typeof(long) || type == typeof(DateTime)
+                                        ? "BIGINT DEFAULT 0"
+                                        : type == typeof(int)
+                                            ? "INT DEFAULT 0"
+                                            : type == typeof(short)
+                                                ? "SMALLINT DEFAULT 0"
+                                                : type == typeof(bool) || type == typeof(byte)
+                                                    ? "TINYINT DEFAULT 0"
+                                                    : "BLOB NULL";
         }
     }
 }

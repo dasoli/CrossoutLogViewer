@@ -1,18 +1,13 @@
-﻿using CrossoutLogView.Common;
-
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.IO;
-using System.Text;
 using System.Windows.Media.Imaging;
+using CrossoutLogView.Common;
+using NLog;
 
 namespace CrossoutLogView.GUI.Helpers
 {
     internal class ImageHelper
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
         public enum FormatSize
         {
             Small_128,
@@ -20,13 +15,16 @@ namespace CrossoutLogView.GUI.Helpers
             Original_992
         }
 
-        private static ConcurrentDictionary<string, BitmapImage> imageCache = new ConcurrentDictionary<string, BitmapImage>();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+        private static readonly ConcurrentDictionary<string, BitmapImage> imageCache =
+            new ConcurrentDictionary<string, BitmapImage>();
 
         private static string MapFilePath(string mapName, FormatSize size)
         {
-            if (String.IsNullOrEmpty(mapName)) return String.Empty;
+            if (string.IsNullOrEmpty(mapName)) return string.Empty;
             // Relative path to map image
-            string filename = @".\images\" + mapName.Trim();
+            var filename = @".\images\" + mapName.Trim();
             // Append size modifer
             switch (size)
             {
@@ -40,6 +38,7 @@ namespace CrossoutLogView.GUI.Helpers
                 case FormatSize.Original_992:
                     break;
             }
+
             // Append file extention
             filename += ".jpg";
             return filename;
@@ -47,22 +46,24 @@ namespace CrossoutLogView.GUI.Helpers
 
         internal static BitmapImage GetMapImage(string mapName, FormatSize size = FormatSize.Medium_256)
         {
-            if (String.IsNullOrEmpty(mapName))
+            if (string.IsNullOrEmpty(mapName))
             {
                 logger.Warn("Map name is null or empty");
                 return null;
             }
+
             // Try to get cached image
             if (imageCache.TryGetValue(mapName, out var img))
                 return img;
             // Get image path
             var path = MapFilePath(mapName, size);
             // Check for invalid path
-            if (String.IsNullOrEmpty(path) || !File.Exists(path))
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
                 logger.Error("Map image not found. Path: \"" + path + "\"");
                 return null;
             }
+
             // Open filestream to image at path
             using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             // Initialize BitmapImage

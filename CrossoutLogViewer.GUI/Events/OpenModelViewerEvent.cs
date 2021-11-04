@@ -1,14 +1,10 @@
-﻿using CrossoutLogView.GUI.Core;
-using CrossoutLogView.GUI.Models;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System;
+using CrossoutLogView.GUI.Core;
 
 namespace CrossoutLogView.GUI.Events
 {
     public delegate void OpenModelViewerEventHandler(object sender, OpenModelViewerEventArgs e);
+
     public sealed class OpenModelViewerEventArgs : EventArgs
     {
         public OpenModelViewerEventArgs(ViewModelBase viewModel, EventArgs innerEvent = null)

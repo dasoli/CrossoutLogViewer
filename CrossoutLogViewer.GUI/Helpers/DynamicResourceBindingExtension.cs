@@ -1,21 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
-using System.Windows.Media;
 
 namespace CrossoutLogView.GUI.Helpers
 {
     public class DynamicResourceBindingExtension : MarkupExtension
     {
-        public DynamicResourceBindingExtension() { }
+        private BindingProxy bindingSource;
+        private BindingTrigger bindingTrigger;
+
+        public DynamicResourceBindingExtension()
+        {
+        }
+
         public DynamicResourceBindingExtension(object resourceKey)
-            => ResourceKey = resourceKey ?? throw new ArgumentNullException(nameof(resourceKey));
+        {
+            ResourceKey = resourceKey ?? throw new ArgumentNullException(nameof(resourceKey));
+        }
 
         public object ResourceKey { get; set; }
         public IValueConverter Converter { get; set; }
@@ -24,12 +28,8 @@ namespace CrossoutLogView.GUI.Helpers
         public string StringFormat { get; set; }
         public object TargetNullValue { get; set; }
 
-        private BindingProxy bindingSource;
-        private BindingTrigger bindingTrigger;
-
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-
             // Get the binding source for all targets affected by this MarkupExtension
             // whether set directly on an element or object, or when applied via a style
             var dynamicResource = new DynamicResourceExtension(ResourceKey);
@@ -38,7 +38,7 @@ namespace CrossoutLogView.GUI.Helpers
             // Set up the binding using the just-created source
             // Note, we don't yet set the Converter, ConverterParameter, StringFormat
             // or TargetNullValue (More on that below)
-            var dynamicResourceBinding = new Binding()
+            var dynamicResourceBinding = new Binding
             {
                 Source = bindingSource,
                 Path = new PropertyPath(BindingProxy.ValueProperty),
@@ -51,7 +51,6 @@ namespace CrossoutLogView.GUI.Helpers
             // Check if this is a DependencyObject. If so, we can set up everything right here.
             if (targetInfo.TargetObject is DependencyObject dependencyObject)
             {
-
                 // Ok, since we're being applied directly on a DependencyObject, we can
                 // go ahead and set all those missing properties on the binding now.
                 dynamicResourceBinding.Converter = Converter;
@@ -76,20 +75,21 @@ namespace CrossoutLogView.GUI.Helpers
             // and finally, since we have no way of getting the BindingExpressions (as there will be one wherever
             // the style is applied), we create a third child binding which is a convenience object on which we
             // trigger a change notification, thus refreshing the binding.
-            var findTargetBinding = new Binding()
+            var findTargetBinding = new Binding
             {
                 RelativeSource = new RelativeSource(RelativeSourceMode.Self)
             };
 
             bindingTrigger = new BindingTrigger();
 
-            var wrapperBinding = new MultiBinding()
+            var wrapperBinding = new MultiBinding
             {
-                Bindings = {
-                dynamicResourceBinding,
-                findTargetBinding,
-                bindingTrigger.Binding
-            },
+                Bindings =
+                {
+                    dynamicResourceBinding,
+                    findTargetBinding,
+                    bindingTrigger.Binding
+                },
                 Converter = new InlineMultiConverter(WrapperConvert)
             };
 
@@ -100,18 +100,18 @@ namespace CrossoutLogView.GUI.Helpers
         // either when applied directly, or via a style
         private object WrapperConvert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-
             var dynamicResourceBindingResult = values[0]; // This is the result of the DynamicResourceBinding**
             var bindingTargetObject = values[1]; // The ultimate target of the binding
-                                                 // We can ignore the bogus third value (in 'values[2]') as that's the dummy result
-                                                 // of the BindingTrigger's value which will always be 'null'
+            // We can ignore the bogus third value (in 'values[2]') as that's the dummy result
+            // of the BindingTrigger's value which will always be 'null'
 
             // ** Note: This value has not yet been passed through the converter, nor been coalesced
             // against TargetNullValue, or, if applicable, formatted, both of which we have to do here.
             if (Converter != null)
                 // We pass in the TargetType we're handed here as that's the real target. Child bindings
                 // would've normally been handed 'object' since their target is the MultiBinding.
-                dynamicResourceBindingResult = Converter.Convert(dynamicResourceBindingResult, targetType, ConverterParameter, ConverterCulture);
+                dynamicResourceBindingResult = Converter.Convert(dynamicResourceBindingResult, targetType,
+                    ConverterParameter, ConverterCulture);
 
             // Check the results for null. If so, assign it to TargetNullValue
             // Otherwise, check if the target type is a string, and that there's a StringFormat
@@ -121,14 +121,14 @@ namespace CrossoutLogView.GUI.Helpers
             if (dynamicResourceBindingResult == null)
                 dynamicResourceBindingResult = TargetNullValue;
             else if (targetType == typeof(string) && StringFormat != null)
-                dynamicResourceBindingResult = String.Format(CultureInfo.InvariantCulture, StringFormat, dynamicResourceBindingResult);
+                dynamicResourceBindingResult = string.Format(CultureInfo.InvariantCulture, StringFormat,
+                    dynamicResourceBindingResult);
 
             // If the binding target object is a FrameworkElement, ensure the BindingSource is added
             // to its Resources collection so it will be part of the lookup relative to the FrameworkElement
             if (bindingTargetObject is FrameworkElement targetFrameworkElement
-            && !targetFrameworkElement.Resources.Contains(bindingSource))
+                && !targetFrameworkElement.Resources.Contains(bindingSource))
             {
-
                 // Add the resource to the target object's Resources collection
                 targetFrameworkElement.Resources[bindingSource] = bindingSource;
 
@@ -140,11 +140,7 @@ namespace CrossoutLogView.GUI.Helpers
                 // Note: since we're currently in the Convert method from the current operation,
                 // we must make the change via a 'Post' call or else we will get results returned
                 // out of order and the UI won't refresh properly.
-                SynchronizationContext.Current.Post((state) => {
-
-                    bindingTrigger.Refresh();
-
-                }, null);
+                SynchronizationContext.Current.Post(state => { bindingTrigger.Refresh(); }, null);
             }
 
             // Return the now-properly-resolved result of the child binding

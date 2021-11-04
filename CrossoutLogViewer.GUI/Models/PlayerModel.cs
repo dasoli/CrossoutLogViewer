@@ -1,18 +1,17 @@
-﻿using CrossoutLogView.GUI.Core;
-using CrossoutLogView.Statistics;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Windows.Media;
-
-using static CrossoutLogView.Common.Strings;
+using CrossoutLogView.GUI.Core;
+using CrossoutLogView.Statistics;
 
 namespace CrossoutLogView.GUI.Models
 {
     public sealed class PlayerModel : CollectionViewModelBase
     {
+        private IEnumerable<StripeModel> _stripes;
+
+        private IEnumerable<WeaponModel> _weapons;
+
         public PlayerModel()
         {
             Player = new Player();
@@ -28,26 +27,23 @@ namespace CrossoutLogView.GUI.Models
             UpdateCollectionsSafe();
         }
 
-        protected override void UpdateCollections()
-        {
-            if (Player == null) return;
-            Player.Weapons.Sort((x, y) => (y.ArmorDamage + y.CriticalDamage).CompareTo(x.ArmorDamage + x.CriticalDamage));
-            Weapons = Player.Weapons.Select(x => new WeaponModel(this, x));
-            Player.Stripes.Sort((x, y) => y.Ammount.CompareTo(x.Ammount));
-            Stripes = Player.Stripes.Select(x => new StripeModel(this, x));
-        }
-
-        public bool Won { get => Parent.WinningTeam == Player.Team; }
+        public bool Won => Parent.WinningTeam == Player.Team;
 
         public GameModel Parent { get; }
 
         public Player Player { get; }
 
-        private IEnumerable<WeaponModel> _weapons;
-        public IEnumerable<WeaponModel> Weapons { get => _weapons; private set => Set(ref _weapons, value); }
+        public IEnumerable<WeaponModel> Weapons
+        {
+            get => _weapons;
+            private set => Set(ref _weapons, value);
+        }
 
-        private IEnumerable<StripeModel> _stripes;
-        public IEnumerable<StripeModel> Stripes { get => _stripes; private set => Set(ref _stripes, value); }
+        public IEnumerable<StripeModel> Stripes
+        {
+            get => _stripes;
+            private set => Set(ref _stripes, value);
+        }
 
         public string Name => Player.Name;
 
@@ -74,10 +70,23 @@ namespace CrossoutLogView.GUI.Models
         public int Deaths => Player.Deaths;
 
         public byte Team => Player.Team;
+
+        protected override void UpdateCollections()
+        {
+            if (Player == null) return;
+            Player.Weapons.Sort(
+                (x, y) => (y.ArmorDamage + y.CriticalDamage).CompareTo(x.ArmorDamage + x.CriticalDamage));
+            Weapons = Player.Weapons.Select(x => new WeaponModel(this, x));
+            Player.Stripes.Sort((x, y) => y.Ammount.CompareTo(x.Ammount));
+            Stripes = Player.Stripes.Select(x => new StripeModel(this, x));
+        }
     }
 
     public sealed class PlayerModelScoreDescending : IComparer<PlayerModel>
     {
-        int IComparer<PlayerModel>.Compare(PlayerModel x, PlayerModel y) => y.Score.CompareTo(x.Score);
+        int IComparer<PlayerModel>.Compare(PlayerModel x, PlayerModel y)
+        {
+            return y.Score.CompareTo(x.Score);
+        }
     }
 }

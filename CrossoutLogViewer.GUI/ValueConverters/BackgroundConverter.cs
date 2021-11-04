@@ -1,11 +1,9 @@
-﻿using CrossoutLogView.GUI.Models;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Text;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using CrossoutLogView.GUI.Models;
 
 namespace CrossoutLogView.GUI.ValueConverters
 {
@@ -16,12 +14,15 @@ namespace CrossoutLogView.GUI.ValueConverters
             if (targetType == typeof(Brush) || targetType == typeof(object))
             {
                 if (value is PlayerGameModel playerGame)
-                    return playerGame.Won ? App.Current.Resources["TeamWon"] as Brush : !playerGame.Unfinished ? App.Current.Resources["TeamLost"] as Brush : default;
+                    return playerGame.Won ? Application.Current.Resources["TeamWon"] as Brush :
+                        !playerGame.Unfinished ? Application.Current.Resources["TeamLost"] as Brush : default;
                 if (value is GameModel game)
-                    return game.Won ? App.Current.Resources["TeamWon"] as Brush : !game.Unfinished ? App.Current.Resources["TeamLost"] as Brush : default;
+                    return game.Won ? Application.Current.Resources["TeamWon"] as Brush :
+                        !game.Unfinished ? Application.Current.Resources["TeamLost"] as Brush : default;
                 if (value is RoundModel round)
-                    return App.Current.Resources[round.Won ? "TeamWon" : "TeamLost"] as Brush;
+                    return Application.Current.Resources[round.Won ? "TeamWon" : "TeamLost"] as Brush;
             }
+
             throw new NotSupportedException();
         }
 

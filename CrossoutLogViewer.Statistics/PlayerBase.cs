@@ -5,22 +5,22 @@ namespace CrossoutLogView.Statistics
 {
     public abstract class PlayerBase
     {
-        public string Name;
-        public int UserID;
-        public double Score;
         public double ArmorDamageDealt;
-        public double CriticalDamageDealt;
         public double ArmorDamageTaken;
-        public double CriticalDamageTaken;
-        public int Kills;
         public int Assists;
+        public double CriticalDamageDealt;
+        public double CriticalDamageTaken;
         public int Deaths;
-        public List<Weapon> Weapons;
+        public int Kills;
+        public string Name;
+        public double Score;
         public List<Stripe> Stripes;
+        public int UserID;
+        public List<Weapon> Weapons;
 
         protected PlayerBase()
         {
-            Name = String.Empty;
+            Name = string.Empty;
             UserID = -1;
             Score = 0;
             ArmorDamageDealt = 0;
@@ -60,6 +60,7 @@ namespace CrossoutLogView.Statistics
                     myWeapon.CriticalDamage += weapon.CriticalDamage;
                 }
             }
+
             //merge stripes
             foreach (var stripe in other.Stripes)
             {

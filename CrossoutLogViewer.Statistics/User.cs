@@ -8,11 +8,12 @@ namespace CrossoutLogView.Statistics
     {
         public List<Game> Participations;
 
-        public User() : base()
+        public User()
         {
             Participations = new List<Game>();
         }
-        public User(string name, int userId) : base()
+
+        public User(string name, int userId)
         {
             Name = name;
             UserID = userId;
@@ -37,33 +38,43 @@ namespace CrossoutLogView.Statistics
             Participations = participations;
         }
 
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
         public static List<User> Parse(IEnumerable<Game> games)
         {
             var users = new List<User>();
             foreach (var game in games)
+            foreach (var player in game.Players.Where(x => !x.IsBot))
             {
-                foreach (var player in game.Players.Where(x => !x.IsBot))
+                var user = users.Find(x => x.UserID == player.UserID);
+                if (user == null)
                 {
-                    var user = users.Find(x => x.UserID == player.UserID);
-                    if (user == null)
-                    {
-                        user = new User(player.Name, player.UserID);
-                        users.Add(user);
-                    }
-                    Merge(user, player);
-                    if (!user.Participations.Any(x => x.Start == game.Start)) //duplicates
-                        user.Participations.Add(game);
+                    user = new User(player.Name, player.UserID);
+                    users.Add(user);
                 }
+
+                Merge(user, player);
+                if (!user.Participations.Any(x => x.Start == game.Start)) //duplicates
+                    user.Participations.Add(game);
             }
+
             return users;
         }
 
-        object ICloneable.Clone() => Clone();
-        public User Clone() => new User(Name, UserID, Score,
-            ArmorDamageDealt, CriticalDamageDealt, ArmorDamageTaken, CriticalDamageTaken,
-            Kills, Assists, Deaths,
-            Weapons, Stripes, Participations);
+        public User Clone()
+        {
+            return new User(Name, UserID, Score,
+                ArmorDamageDealt, CriticalDamageDealt, ArmorDamageTaken, CriticalDamageTaken,
+                Kills, Assists, Deaths,
+                Weapons, Stripes, Participations);
+        }
 
-        public override string ToString() => String.Concat(nameof(User), " ", Name, " ", UserID, " ", Participations?.Count);
+        public override string ToString()
+        {
+            return string.Concat(nameof(User), " ", Name, " ", UserID, " ", Participations?.Count);
+        }
     }
 }

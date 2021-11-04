@@ -1,11 +1,13 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class LevelLoad : ILogEntry
     {
+        public short LevelStart;
+        public string MapPathName;
+
         public LevelLoad(long timeStamp, short levelStart, string mapPathName)
         {
             TimeStamp = timeStamp;
@@ -13,11 +15,11 @@ namespace CrossoutLogView.Log
             MapPathName = mapPathName;
         }
 
-        public LevelLoad() { }
+        public LevelLoad()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public short LevelStart;
-        public string MapPathName;
 
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out LevelLoad deserialized)

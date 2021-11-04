@@ -14,8 +14,8 @@ namespace CrossoutLogView.Database.Data
 
         public static Uri GetMapImageUri(string mapName, FormatSize size = FormatSize.Medium_256)
         {
-            if (String.IsNullOrEmpty(mapName)) return null;
-            string filename = mapName.Trim();
+            if (string.IsNullOrEmpty(mapName)) return null;
+            var filename = mapName.Trim();
             switch (size)
             {
                 case FormatSize.Small_128:
@@ -28,6 +28,7 @@ namespace CrossoutLogView.Database.Data
                 case FormatSize.Original_992:
                     break;
             }
+
             var uri = new Uri(Environment.CurrentDirectory + "//images//" + filename + ".jpg", UriKind.Absolute);
             return File.Exists(uri.AbsolutePath) ? uri : null;
         }

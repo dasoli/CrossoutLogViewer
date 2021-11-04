@@ -1,38 +1,27 @@
-﻿using ControlzEx.Theming;
-
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using CrossoutLogView.Common;
+using CrossoutLogView.Database.Collection;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.Database.Events;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Models;
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Threading;
-
 namespace CrossoutLogView.GUI
 {
     public sealed class CollectedStatisticsWindowViewModel : WindowViewModelBase
     {
-        private ObservableCollection<PlayerGameModel> _playerGameModels;
-        private ObservableCollection<WeaponGlobalModel> _weaponModel;
-        private ObservableCollection<UserModel> _userModels;
-        private UserModel _meUser;
         private ObservableCollection<MapModel> _maps;
+        private UserModel _meUser;
+        private ObservableCollection<PlayerGameModel> _playerGameModels;
+        private ObservableCollection<UserModel> _userModels;
+        private ObservableCollection<WeaponGlobalModel> _weaponModel;
 
-        public static event InvalidateCachedDataEventHandler InvalidatedCachedData;
-
-        public CollectedStatisticsWindowViewModel() : base()
+        public CollectedStatisticsWindowViewModel()
         {
-            Database.Collection.StatisticsUploader.InvalidateCachedData += OnInvalidateCachedData;
+            StatisticsUploader.InvalidateCachedData += OnInvalidateCachedData;
         }
 
         public CollectedStatisticsWindowViewModel(Dispatcher windowDispatcher) : this()
@@ -40,15 +29,37 @@ namespace CrossoutLogView.GUI
             WindowDispatcher = windowDispatcher;
         }
 
-        public ObservableCollection<PlayerGameModel> PlayerGameModels { get => _playerGameModels; set => Set(ref _playerGameModels, value); }
+        public ObservableCollection<PlayerGameModel> PlayerGameModels
+        {
+            get => _playerGameModels;
+            set => Set(ref _playerGameModels, value);
+        }
 
-        public ObservableCollection<WeaponGlobalModel> WeaponModels { get => _weaponModel; set => Set(ref _weaponModel, value); }
+        public ObservableCollection<WeaponGlobalModel> WeaponModels
+        {
+            get => _weaponModel;
+            set => Set(ref _weaponModel, value);
+        }
 
-        public ObservableCollection<UserModel> UserModels { get => _userModels; set => Set(ref _userModels, value); }
+        public ObservableCollection<UserModel> UserModels
+        {
+            get => _userModels;
+            set => Set(ref _userModels, value);
+        }
 
-        public UserModel MeUser { get => _meUser; set => Set(ref _meUser, value); }
+        public UserModel MeUser
+        {
+            get => _meUser;
+            set => Set(ref _meUser, value);
+        }
 
-        public ObservableCollection<MapModel> Maps { get => _maps; set => Set(ref _maps, value); }
+        public ObservableCollection<MapModel> Maps
+        {
+            get => _maps;
+            set => Set(ref _maps, value);
+        }
+
+        public static event InvalidateCachedDataEventHandler InvalidatedCachedData;
 
         protected override void OnInitialize()
         {
@@ -63,26 +74,27 @@ namespace CrossoutLogView.GUI
             ObservableCollection<UserModel> users = null;
             ObservableCollection<MapModel> maps = null;
             Task.WaitAll(
-            Task.Run(delegate
-            {
-                meUser = new UserModel(DataProvider.GetUser(Settings.Current.MyUserID));
-                meUser.Participations.Sort(new PlayerGameModelStartTimeDescending());
-            }),
-            Task.Run(delegate
-            {
-                weapons = new ObservableCollection<WeaponGlobalModel>(DataProvider.GetWeapons().Select(w => new WeaponGlobalModel(w)));
-                weapons.Sort(new WeaponGlobalModelTotalUsesDescending());
-            }),
-            Task.Run(delegate
-            {
-                users = new ObservableCollection<UserModel>(DataProvider.GetUsers().Select(u => new UserModel(u)));
-                users.Sort(new UserModelParticipationCountDescending());
-            }),
-            Task.Run(delegate
-            {
-                maps = new ObservableCollection<MapModel>(DataProvider.GetMaps().Select(m => new MapModel(m)));
-                maps.Sort(new MapModelGamesPlayedDecending());
-            }));
+                Task.Run(delegate
+                {
+                    meUser = new UserModel(DataProvider.GetUser(Settings.Current.MyUserID));
+                    meUser.Participations.Sort(new PlayerGameModelStartTimeDescending());
+                }),
+                Task.Run(delegate
+                {
+                    weapons = new ObservableCollection<WeaponGlobalModel>(DataProvider.GetWeapons()
+                        .Select(w => new WeaponGlobalModel(w)));
+                    weapons.Sort(new WeaponGlobalModelTotalUsesDescending());
+                }),
+                Task.Run(delegate
+                {
+                    users = new ObservableCollection<UserModel>(DataProvider.GetUsers().Select(u => new UserModel(u)));
+                    users.Sort(new UserModelParticipationCountDescending());
+                }),
+                Task.Run(delegate
+                {
+                    maps = new ObservableCollection<MapModel>(DataProvider.GetMaps().Select(m => new MapModel(m)));
+                    maps.Sort(new MapModelGamesPlayedDecending());
+                }));
             WindowDispatcher.Invoke(delegate
             {
                 MeUser = meUser;
@@ -109,6 +121,7 @@ namespace CrossoutLogView.GUI
                     if (index == -1) WeaponModels.Add(weapon);
                     else WeaponModels[index] = weapon;
                 }
+
                 WeaponModels.Sort(new WeaponGlobalModelTotalUsesDescending());
                 foreach (var userId in e.UsersChanged)
                 {
@@ -117,6 +130,7 @@ namespace CrossoutLogView.GUI
                     if (index == -1) UserModels.Add(user);
                     else UserModels[index] = user;
                 }
+
                 UserModels.Sort(new UserModelParticipationCountDescending());
                 foreach (var mapName in e.MapsPlayed)
                 {
@@ -125,6 +139,7 @@ namespace CrossoutLogView.GUI
                     if (index == -1) Maps.Add(map);
                     else Maps[index] = map;
                 }
+
                 Maps.Sort(new MapModelGamesPlayedDecending());
             });
             InvalidatedCachedData?.Invoke(sender, e);

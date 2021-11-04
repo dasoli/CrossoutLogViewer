@@ -1,10 +1,5 @@
 ﻿using CrossoutLogView.GUI.Services;
-
 using NLog;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CrossoutLogView.Common
 {
@@ -14,10 +9,12 @@ namespace CrossoutLogView.Common
         {
             logger.Trace(ResourceManagerService.GetResourceString("LogResources", resoureKey));
         }
+
         public static void InfoResource(this Logger logger, string resoureKey)
         {
             logger.Info(ResourceManagerService.GetResourceString("LogResources", resoureKey));
         }
+
         public static void ErrorResource(this Logger logger, string resoureKey)
         {
             logger.Error(ResourceManagerService.GetResourceString("LogResources", resoureKey));

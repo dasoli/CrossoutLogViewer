@@ -1,5 +1,5 @@
-﻿
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Database.Data
 {
@@ -16,15 +16,34 @@ namespace CrossoutLogView.Database.Data
 
         public static LogMetadata Parse(string path)
         {
-            var norm = Common.PathUtility.NormalizePath(path);
-            return new LogMetadata(norm, Common.PathUtility.ParseCrossoutLogDirectoryName(Common.PathUtility.GetDirectoryName(path)).Ticks);
+            var norm = PathUtility.NormalizePath(path);
+            return new LogMetadata(norm,
+                PathUtility.ParseCrossoutLogDirectoryName(PathUtility.GetDirectoryName(path)).Ticks);
         }
 
-        public override bool Equals(object obj) => obj is LogMetadata metadata && Equals(metadata);
-        public bool Equals(LogMetadata other) => Path == other.Path && DateTime == other.DateTime;
-        public override int GetHashCode() => HashCode.Combine(Path, DateTime);
+        public override bool Equals(object obj)
+        {
+            return obj is LogMetadata metadata && Equals(metadata);
+        }
 
-        public static bool operator ==(LogMetadata left, LogMetadata right) => left.Equals(right);
-        public static bool operator !=(LogMetadata left, LogMetadata right) => !(left == right);
+        public bool Equals(LogMetadata other)
+        {
+            return Path == other.Path && DateTime == other.DateTime;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Path, DateTime);
+        }
+
+        public static bool operator ==(LogMetadata left, LogMetadata right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(LogMetadata left, LogMetadata right)
+        {
+            return !(left == right);
+        }
     }
 }

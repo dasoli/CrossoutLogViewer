@@ -1,20 +1,45 @@
-﻿using CrossoutLogView.GUI.Core;
-
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using CrossoutLogView.GUI.Core;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for DateSlider.xaml
+    ///     Interaction logic for DateSlider.xaml
     /// </summary>
     public partial class DateSlider : ILogging
     {
-        private int _minimum = -7, _maximum = 7, value = 0;
-        public event RoutedPropertyChangedEventHandler<int> ValueChanged;
+        public static readonly DependencyPropertyKey MiddlePropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(Middle), typeof(string), typeof(DateSlider),
+                new FrameworkPropertyMetadata(string.Empty, RefreshOnPropertyChanged));
+
+        public static readonly DependencyProperty MiddleProperty = MiddlePropertyKey.DependencyProperty;
+
+        public static readonly DependencyPropertyKey LeftPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Left),
+            typeof(string), typeof(DateSlider), new FrameworkPropertyMetadata(string.Empty, RefreshOnPropertyChanged));
+
+        public static readonly DependencyProperty LeftProperty = LeftPropertyKey.DependencyProperty;
+
+        public static readonly DependencyPropertyKey RightPropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(Right), typeof(string), typeof(DateSlider),
+                new FrameworkPropertyMetadata(string.Empty, RefreshOnPropertyChanged));
+
+        public static readonly DependencyProperty RightProperty = RightPropertyKey.DependencyProperty;
+
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum),
+            typeof(int), typeof(DateSlider), new PropertyMetadata(7, MaximumPropertyChanged));
+
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum),
+            typeof(int), typeof(DateSlider), new PropertyMetadata(-7, MinimumPropertyChanged));
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value),
+            typeof(int), typeof(DateSlider), new PropertyMetadata(0, ValuePropertyChanged));
+
+        private int _minimum = -7, _maximum = 7, value;
 
         public DateSlider()
         {
@@ -23,46 +48,63 @@ namespace CrossoutLogView.GUI.Controls
         }
 
         /// <summary>
-        /// The value filling the middle slot of the <see cref="DateSlider"/>.
+        ///     The value filling the middle slot of the <see cref="DateSlider" />.
         /// </summary>
-        public string Middle { get => GetValue(MiddleProperty) as string; protected set { SetValue(MiddlePropertyKey, value); } }
-        public static readonly DependencyPropertyKey MiddlePropertyKey = DependencyProperty.RegisterReadOnly(nameof(Middle), typeof(string), typeof(DateSlider), new FrameworkPropertyMetadata(String.Empty, RefreshOnPropertyChanged));
-        public static readonly DependencyProperty MiddleProperty = MiddlePropertyKey.DependencyProperty;
+        public string Middle
+        {
+            get => GetValue(MiddleProperty) as string;
+            protected set => SetValue(MiddlePropertyKey, value);
+        }
 
         /// <summary>
-        /// The value filling the left slot of the <see cref="DateSlider"/>.
+        ///     The value filling the left slot of the <see cref="DateSlider" />.
         /// </summary>
-        public string Left { get => GetValue(LeftProperty) as string; protected set { SetValue(LeftPropertyKey, value); } }
-        public static readonly DependencyPropertyKey LeftPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Left), typeof(string), typeof(DateSlider), new FrameworkPropertyMetadata(String.Empty, RefreshOnPropertyChanged));
-        public static readonly DependencyProperty LeftProperty = LeftPropertyKey.DependencyProperty;
+        public string Left
+        {
+            get => GetValue(LeftProperty) as string;
+            protected set => SetValue(LeftPropertyKey, value);
+        }
 
         /// <summary>
-        /// The value filling the right slot of the <see cref="DateSlider"/>.
+        ///     The value filling the right slot of the <see cref="DateSlider" />.
         /// </summary>
-        public string Right { get => GetValue(RightProperty) as string; protected set { SetValue(RightPropertyKey, value); } }
-        public static readonly DependencyPropertyKey RightPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Right), typeof(string), typeof(DateSlider), new FrameworkPropertyMetadata(String.Empty, RefreshOnPropertyChanged));
-        public static readonly DependencyProperty RightProperty = RightPropertyKey.DependencyProperty;
-
-
-        /// <summary>
-        /// The value representing the upper bound of valid values.
-        /// </summary>
-        public int Maximum { get => (int)GetValue(MaximumProperty); set => SetValue(MaximumProperty, value); }
-        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(int), typeof(DateSlider), new PropertyMetadata(7, MaximumPropertyChanged));
-
-
-        /// <summary>
-        /// The value representing the lower bound of valid values.
-        /// </summary>
-        public int Minimum { get => (int)GetValue(MinimumProperty); set => SetValue(MinimumProperty, value); }
-        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(int), typeof(DateSlider), new PropertyMetadata(-7, MinimumPropertyChanged));
+        public string Right
+        {
+            get => GetValue(RightProperty) as string;
+            protected set => SetValue(RightPropertyKey, value);
+        }
 
 
         /// <summary>
-        /// The current value of the <see cref="DateSlider"/>.
+        ///     The value representing the upper bound of valid values.
         /// </summary>
-        public int Value { get => (int)GetValue(ValueProperty); set => SetValue(ValueProperty, value); }
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(int), typeof(DateSlider), new PropertyMetadata(0, ValuePropertyChanged));
+        public int Maximum
+        {
+            get => (int)GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
+        }
+
+
+        /// <summary>
+        ///     The value representing the lower bound of valid values.
+        /// </summary>
+        public int Minimum
+        {
+            get => (int)GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
+        }
+
+
+        /// <summary>
+        ///     The current value of the <see cref="DateSlider" />.
+        /// </summary>
+        public int Value
+        {
+            get => (int)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        public event RoutedPropertyChangedEventHandler<int> ValueChanged;
 
 
         private static void MaximumPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
@@ -97,7 +139,7 @@ namespace CrossoutLogView.GUI.Controls
         {
             if (!(obj is DateSlider ds))
                 throw new ArgumentException("The parameter must be of the type DateSlider.", nameof(obj));
-            int oldValue = (int)(e.OldValue ?? ValueProperty.DefaultMetadata.DefaultValue);
+            var oldValue = (int)(e.OldValue ?? ValueProperty.DefaultMetadata.DefaultValue);
             if (!(e.NewValue is int newValue))
                 ds.Value = newValue = oldValue;
             if (newValue == oldValue)
@@ -127,17 +169,18 @@ namespace CrossoutLogView.GUI.Controls
                 else if (value > _maximum)
                     value = _maximum;
             }
+
             Middle = DisplayStringFromValue(value);
 
             int leftV = value - 1, rightv = value + 1;
             if (Validate(leftV))
                 Left = DisplayStringFromValue(leftV);
             else
-                Left = String.Empty;
+                Left = string.Empty;
             if (Validate(rightv))
                 Right = DisplayStringFromValue(rightv);
             else
-                Right = String.Empty;
+                Right = string.Empty;
         }
 
         private void NavigateUp(object sender, MouseButtonEventArgs e)
@@ -163,15 +206,20 @@ namespace CrossoutLogView.GUI.Controls
                 0 => App.GetControlResource("Date_Tdy"),
                 1 => App.GetControlResource("Date_Tmrw"),
                 -1 => App.GetControlResource("Date_Ystdy"),
-                _ => value.ToString(CultureInfo.CurrentUICulture.NumberFormat),
+                _ => value.ToString(CultureInfo.CurrentUICulture.NumberFormat)
             };
         }
 
-        private bool Validate(int? value) => value != null && _minimum <= value && value <= _maximum;
+        private bool Validate(int? value)
+        {
+            return value != null && _minimum <= value && value <= _maximum;
+        }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

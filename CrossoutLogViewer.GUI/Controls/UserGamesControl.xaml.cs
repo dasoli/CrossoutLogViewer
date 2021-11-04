@@ -1,37 +1,22 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Database.Data;
+﻿using System.Windows;
+using System.Windows.Controls;
+using CrossoutLogView.Common;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.GUI.Models;
-using CrossoutLogView.Statistics;
-
 using MahApps.Metro.Controls;
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for UserGamesControl.xaml
+    ///     Interaction logic for UserGamesControl.xaml
     /// </summary>
     public partial class UserGamesControl : ILogging
     {
-        public event OpenModelViewerEventHandler OpenViewModel;
+        public static readonly DependencyProperty UserProperty = DependencyProperty.Register(nameof(User),
+            typeof(UserModel), typeof(UserGamesControl), new PropertyMetadata(OnUserPropertyChanged));
 
         public UserGamesControl()
         {
@@ -52,10 +37,15 @@ namespace CrossoutLogView.GUI.Controls
 
 
         /// <summary>
-        /// Gets or sets the <see cref="UserModel"/> used to generate the content of the <see cref="UserGamesControl"/>.
+        ///     Gets or sets the <see cref="UserModel" /> used to generate the content of the <see cref="UserGamesControl" />.
         /// </summary>
-        public UserModel User { get => GetValue(UserProperty) as UserModel; set => SetValue(UserProperty, value); }
-        public static readonly DependencyProperty UserProperty = DependencyProperty.Register(nameof(User), typeof(UserModel), typeof(UserGamesControl), new PropertyMetadata(OnUserPropertyChanged));
+        public UserModel User
+        {
+            get => GetValue(UserProperty) as UserModel;
+            set => SetValue(UserProperty, value);
+        }
+
+        public event OpenModelViewerEventHandler OpenViewModel;
 
         private static void OnUserPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -68,7 +58,11 @@ namespace CrossoutLogView.GUI.Controls
             }
         }
 
-        private void RefreshGamesFilter(object sender, ValueChangedEventArgs<GameFilter> e) => RefreshGamesFilter();
+        private void RefreshGamesFilter(object sender, ValueChangedEventArgs<GameFilter> e)
+        {
+            RefreshGamesFilter();
+        }
+
         private void RefreshGamesFilter()
         {
             if (User != null)
@@ -95,8 +89,10 @@ namespace CrossoutLogView.GUI.Controls
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

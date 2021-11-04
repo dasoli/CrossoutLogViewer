@@ -1,25 +1,22 @@
-﻿using CrossoutLogView.Database.Data;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.GUI.WindowsAuxilary;
 using CrossoutLogView.Statistics;
-
 using MahApps.Metro.Controls.Dialogs;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using NLog;
 
 namespace CrossoutLogView.GUI
 {
     /// <summary>
-    /// Interaction logic for SessionReview.xaml
+    ///     Interaction logic for SessionReview.xaml
     /// </summary>
     public partial class SessionReview : ILogging
     {
@@ -45,7 +42,8 @@ namespace CrossoutLogView.GUI
 
         private void SessionCalendar_SessionClick(object sender, SessionClickEventArgs e)
         {
-            var games = DataProvider.GetGames(e.Day.Date, e.Day.Date.AddDays(1).AddMilliseconds(-1)).Where(x => x.Mode == GameMode.ClanWars);
+            var games = DataProvider.GetGames(e.Day.Date, e.Day.Date.AddDays(1).AddMilliseconds(-1))
+                .Where(x => x.Mode == GameMode.ClanWars);
             PartyControl.ItemsSource = new ObservableCollection<GameModel>(games.Select(x => new GameModel(x)));
         }
 
@@ -60,7 +58,8 @@ namespace CrossoutLogView.GUI
         }
 
         #region Confim close
-        private bool forceClose = false;
+
+        private bool forceClose;
 
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -68,10 +67,7 @@ namespace CrossoutLogView.GUI
             if (!forceClose)
             {
                 e.Cancel = true;
-                Dispatcher.BeginInvoke(new Action(async delegate
-                {
-                    await ConfirmClose();
-                }));
+                Dispatcher.BeginInvoke(new Action(async delegate { await ConfirmClose(); }));
             }
             else
             {
@@ -109,14 +105,17 @@ namespace CrossoutLogView.GUI
                     forceClose = true;
                     break;
             }
+
             if (forceClose) Close();
         }
+
         #endregion
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
-        #endregion
 
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
+        #endregion
     }
 }

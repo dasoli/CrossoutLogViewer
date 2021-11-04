@@ -1,17 +1,43 @@
-﻿using CrossoutLogView.Database.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace CrossoutLogView.GUI.Models
 {
     public class MapModel : StatDisplayViewModeBase
     {
+        private double _armorDamageDealt;
+
+        private double _armorDamageTaken;
+
+        private double _assists;
+
+        private double _criticalDamageDealt;
+
+        private double _criticalDamageTaken;
+
+        private double _deaths;
+
+        private int _gamesLost;
+
+        private int _gamesPlayed;
+
+        private int _gamesUnfinished;
+
+        private int _gamesWon;
+
+        private double _kills;
+
+        private double _score;
+
+        private PlayerGameModel _selectedItem;
+
+        private double _winrate;
+
         public MapModel(GameMap map)
         {
             GameMap = map ?? throw new ArgumentNullException(nameof(map));
@@ -24,53 +50,95 @@ namespace CrossoutLogView.GUI.Models
 
         public string Name { get; }
 
-        private int _gamesPlayed;
-        public int GamesPlayed { get => _gamesPlayed; set => Set(ref _gamesPlayed, value); }
+        public int GamesPlayed
+        {
+            get => _gamesPlayed;
+            set => Set(ref _gamesPlayed, value);
+        }
 
         public IEnumerable<PlayerGameModel> Games { get; private set; }
 
-        private PlayerGameModel _selectedItem;
-        public PlayerGameModel SelectedItem { get => _selectedItem; set => Set(ref _selectedItem, value); }
+        public PlayerGameModel SelectedItem
+        {
+            get => _selectedItem;
+            set => Set(ref _selectedItem, value);
+        }
 
-        private double _winrate;
-        public double Winrate { get => _winrate; set => Set(ref _winrate, value); }
+        public double Winrate
+        {
+            get => _winrate;
+            set => Set(ref _winrate, value);
+        }
 
-        private int _gamesWon;
-        public int GamesWon { get => _gamesWon; set => Set(ref _gamesWon, value); }
+        public int GamesWon
+        {
+            get => _gamesWon;
+            set => Set(ref _gamesWon, value);
+        }
 
-        private int _gamesLost;
-        public int GamesLost { get => _gamesLost; set => Set(ref _gamesLost, value); }
+        public int GamesLost
+        {
+            get => _gamesLost;
+            set => Set(ref _gamesLost, value);
+        }
 
-        private int _gamesUnfinished;
-        public int GamesUnfinished { get => _gamesUnfinished; set => Set(ref _gamesUnfinished, value); }
+        public int GamesUnfinished
+        {
+            get => _gamesUnfinished;
+            set => Set(ref _gamesUnfinished, value);
+        }
 
-        private double _score;
-        public double Score { get => _score; set => Set(ref _score, value); }
+        public double Score
+        {
+            get => _score;
+            set => Set(ref _score, value);
+        }
 
-        private double _kills;
-        public double Kills { get => _kills; set => Set(ref _kills, value); }
+        public double Kills
+        {
+            get => _kills;
+            set => Set(ref _kills, value);
+        }
 
-        private double _assists;
-        public double Assists { get => _assists; set => Set(ref _assists, value); }
+        public double Assists
+        {
+            get => _assists;
+            set => Set(ref _assists, value);
+        }
 
-        private double _deaths;
-        public double Deaths { get => _deaths; set => Set(ref _deaths, value); }
+        public double Deaths
+        {
+            get => _deaths;
+            set => Set(ref _deaths, value);
+        }
 
-        private double _armorDamageDealt;
-        public double ArmorDamageDealt { get => _armorDamageDealt; set => Set(ref _armorDamageDealt, value); }
+        public double ArmorDamageDealt
+        {
+            get => _armorDamageDealt;
+            set => Set(ref _armorDamageDealt, value);
+        }
 
-        private double _criticalDamageDealt;
-        public double CriticalDamageDealt { get => _criticalDamageDealt; set => Set(ref _criticalDamageDealt, value); }
+        public double CriticalDamageDealt
+        {
+            get => _criticalDamageDealt;
+            set => Set(ref _criticalDamageDealt, value);
+        }
 
-        private double _armorDamageTaken;
-        public double ArmorDamageTaken { get => _armorDamageTaken; set => Set(ref _armorDamageTaken, value); }
+        public double ArmorDamageTaken
+        {
+            get => _armorDamageTaken;
+            set => Set(ref _armorDamageTaken, value);
+        }
 
-        private double _criticalDamageTaken;
-        public double CriticalDamageTaken { get => _criticalDamageTaken; set => Set(ref _criticalDamageTaken, value); }
+        public double CriticalDamageTaken
+        {
+            get => _criticalDamageTaken;
+            set => Set(ref _criticalDamageTaken, value);
+        }
 
-        public double TotalDamageDealt { get => _armorDamageDealt + _criticalDamageDealt; }
+        public double TotalDamageDealt => _armorDamageDealt + _criticalDamageDealt;
 
-        public double TotalDamageTaken { get => _armorDamageTaken + _criticalDamageTaken; }
+        public double TotalDamageTaken => _armorDamageTaken + _criticalDamageTaken;
 
         protected override void UpdateCollections()
         {
@@ -82,6 +150,7 @@ namespace CrossoutLogView.GUI.Models
                 if (player != null)
                     games.Add(new PlayerGameModel(game, player));
             }
+
             Games = games;
         }
 
@@ -110,8 +179,12 @@ namespace CrossoutLogView.GUI.Models
             OnPropertyChanged(nameof(TotalDamageTaken));
         }
     }
+
     public sealed class MapModelGamesPlayedDecending : IComparer<MapModel>
     {
-        int IComparer<MapModel>.Compare(MapModel x, MapModel y) => y.GamesPlayed.CompareTo(x.GamesPlayed);
+        int IComparer<MapModel>.Compare(MapModel x, MapModel y)
+        {
+            return y.GamesPlayed.CompareTo(x.GamesPlayed);
+        }
     }
 }

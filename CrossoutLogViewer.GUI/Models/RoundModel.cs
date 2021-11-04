@@ -1,26 +1,23 @@
-﻿using CrossoutLogView.Database.Data;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Windows.Media;
-
-using static CrossoutLogView.Common.Strings;
 
 namespace CrossoutLogView.GUI.Models
 {
     public sealed class RoundModel : ViewModelBase
     {
+        private bool _isExpanded = true;
+
         public RoundModel()
         {
             Round = new Round();
             Game = null;
             Kills = new List<KillModel>();
         }
+
         public RoundModel(GameModel parent, Round obj)
         {
             Game = parent ?? throw new ArgumentNullException(nameof(parent));
@@ -35,10 +32,15 @@ namespace CrossoutLogView.GUI.Models
 
         public IEnumerable<KillModel> Kills { get; }
 
-        private bool _isExpanded = true;
-        public bool IsExpanded { get => _isExpanded; set => Set(ref _isExpanded, value); }
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => Set(ref _isExpanded, value);
+        }
 
-        public int RoundNumber => Game == null || Game.Rounds == null ? 1 : Game.Rounds.FindIndex(x => x.Start == Round.Start) + 1;
+        public int RoundNumber => Game == null || Game.Rounds == null
+            ? 1
+            : Game.Rounds.FindIndex(x => x.Start == Round.Start) + 1;
 
         public DateTime Start => Round.Start;
 

@@ -1,15 +1,13 @@
-﻿using CrossoutLogView.Common;
-
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Updater
 {
-    class Program
+    internal class Program
     {
         private static void Main(string[] args)
         {
-            if (args is null || args.Length == 0 || String.IsNullOrEmpty(args[0]))
+            if (args is null || args.Length == 0 || string.IsNullOrEmpty(args[0]))
                 return;
             switch (args[0].ToUpperInvariant())
             {

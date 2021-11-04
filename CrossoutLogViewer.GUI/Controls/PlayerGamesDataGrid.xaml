@@ -3,7 +3,6 @@
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-          xmlns:local="clr-namespace:CrossoutLogView.GUI.Controls"
           xmlns:helpers="clr-namespace:CrossoutLogView.GUI.Helpers"
           mc:Ignorable="d"
           d:DesignHeight="450"
@@ -15,8 +14,7 @@
           SelectionMode="Extended"
           SelectionUnit="FullRow"
           CanUserAddRows="False"
-          Background="Transparent"
-          Grid.Row="2">
+          Background="Transparent">
     <DataGrid.Resources>
         <ResourceDictionary>
             <helpers:LocalisationHelper x:Key="res"
@@ -41,8 +39,8 @@
     </DataGrid.RowStyle>
     <DataGrid.Columns>
         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[DGGames_Date]}"
-                            Binding="{Binding StartTime}" 
-                            SortDirection="Descending"/>
+                            Binding="{Binding StartTime}"
+                            SortDirection="Descending" />
         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[DGGames_Map]}"
                             Binding="{Binding Map}" />
         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[DGGames_Mode]}"

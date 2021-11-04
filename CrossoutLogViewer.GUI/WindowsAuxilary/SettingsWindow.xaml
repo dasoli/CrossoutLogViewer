@@ -6,8 +6,6 @@
                       mc:Ignorable="d"
                       xmlns:UserControls="clr-namespace:CrossoutLogView.GUI.Controls"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-                      xmlns:local="clr-namespace:CrossoutLogView.GUI"
                       Style="{DynamicResource MetroWindowTitlebarColorStyle}"
                       Title="Crossout Log Viewer: Settings"
                       Icon="..\App.ico"
@@ -151,16 +149,20 @@
                                 HorizontalAlignment="Left" />
                         <Button Content="Update resources"
                                 Style="{DynamicResource Button.Outline}"
-                                Click="UpdateClick" 
+                                Click="UpdateClick"
                                 Margin="{StaticResource ContentMargin}"
-                                HorizontalAlignment="Left"/>
+                                HorizontalAlignment="Left" />
                         <TextBlock>
                             <Hyperlink NavigateUri="https://icons8.com/icons/set/rebalance-portfolio"
-                                       RequestNavigate="Hyperlink_RequestNavigate">Chart icon</Hyperlink>
+                                       RequestNavigate="Hyperlink_RequestNavigate">
+                                Chart icon
+                            </Hyperlink>
                             <LineBreak />
                             <Run>icon by </Run>
                             <Hyperlink NavigateUri="https://icons8.com"
-                                       RequestNavigate="Hyperlink_RequestNavigate">Icons8</Hyperlink>
+                                       RequestNavigate="Hyperlink_RequestNavigate">
+                                Icons8
+                            </Hyperlink>
                             <Run>.</Run>
                         </TextBlock>
                     </ItemsControl>

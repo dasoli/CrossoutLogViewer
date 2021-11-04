@@ -1,13 +1,16 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     [Guid("0747e051-7b1b-4324-9c94-a70c9e1ed72d")]
     public class Score : ILogEntry
     {
+        public byte PlayerNumber;
+        public int ScoreAmmount;
+        public string ScoreReason;
+
         public Score(long timeStamp, byte playerNumber, int scoreAmmount, string scoreReason)
         {
             TimeStamp = timeStamp;
@@ -16,12 +19,11 @@ namespace CrossoutLogView.Log
             ScoreReason = scoreReason;
         }
 
-        public Score() { }
+        public Score()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public byte PlayerNumber;
-        public int ScoreAmmount;
-        public string ScoreReason;
 
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out Score deserialized)

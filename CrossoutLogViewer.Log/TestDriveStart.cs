@@ -1,14 +1,18 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class TestDriveStart : ILogEntry
     {
-        public TestDriveStart(long timeStamp) => TimeStamp = timeStamp;
+        public TestDriveStart(long timeStamp)
+        {
+            TimeStamp = timeStamp;
+        }
 
-        public TestDriveStart() { }
+        public TestDriveStart()
+        {
+        }
 
         public long TimeStamp { get; set; }
 
@@ -16,7 +20,8 @@ namespace CrossoutLogView.Log
         {
             deserialized = default;
             if (logLine.Length < 30) return false;
-            if (!logLine.Contains("====== TestDrive started ======", StringComparison.InvariantCultureIgnoreCase)) return false;
+            if (!logLine.Contains("====== TestDrive started ======", StringComparison.InvariantCultureIgnoreCase))
+                return false;
             var timeStamp = TimeConverter.FromString(logLine, logDate);
             deserialized = new TestDriveStart(timeStamp);
             return true;

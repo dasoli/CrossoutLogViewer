@@ -1,10 +1,7 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Globalization;
 
 namespace CrossoutLogView.GUI.Models
 {
@@ -14,7 +11,7 @@ namespace CrossoutLogView.GUI.Models
         {
             Parent = null;
             Weapon = new Weapon();
-            Name = String.Empty;
+            Name = string.Empty;
         }
 
         public WeaponModel(object parent, Weapon obj)

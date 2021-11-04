@@ -1,12 +1,19 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class KillAssist : ILogEntry
     {
-        public KillAssist(long timeStamp, string assistant, string weapon, double elapsed, double totalDamage, DamageFlag damageFlags)
+        public string Assistant;
+        public DamageFlag DamageFlags;
+        public double Elapsed;
+        public bool IsCriticalDamage;
+        public double TotalDamage;
+        public string Weapon;
+
+        public KillAssist(long timeStamp, string assistant, string weapon, double elapsed, double totalDamage,
+            DamageFlag damageFlags)
         {
             TimeStamp = timeStamp;
             Assistant = assistant;
@@ -16,15 +23,11 @@ namespace CrossoutLogView.Log
             DamageFlags = damageFlags;
         }
 
-        public KillAssist() { }
+        public KillAssist()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string Assistant;
-        public string Weapon;
-        public double Elapsed;
-        public double TotalDamage;
-        public DamageFlag DamageFlags;
-        public bool IsCriticalDamage;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out KillAssist deserialized)
         {

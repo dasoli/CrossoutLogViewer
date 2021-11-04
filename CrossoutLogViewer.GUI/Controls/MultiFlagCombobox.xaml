@@ -3,9 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:CrossoutLogView.GUI.Controls"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
              d:DesignHeight="26"
              d:DesignWidth="150">
@@ -23,9 +21,10 @@
                IsOpen="{Binding ElementName=Expander, Path=IsExpanded}">
             <Border BorderThickness="1"
                     BorderBrush="{DynamicResource MahApps.Brushes.Gray3}">
-                <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=ItemsSource}"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
+                <ItemsControl
+                    ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=ItemsSource}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    Background="{DynamicResource MahApps.Brushes.ThemeBackground}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <CheckBox Content="{Binding Name}"

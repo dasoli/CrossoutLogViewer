@@ -1,35 +1,25 @@
-﻿using ControlzEx.Standard;
-
-using CrossoutLogView.Common;
-using CrossoutLogView.GUI.Core;
-using CrossoutLogView.GUI.Models;
-
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Navigation;
+using CrossoutLogView.Common;
+using CrossoutLogView.GUI.Core;
+using CrossoutLogView.GUI.Models;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+using NLog;
 
 namespace CrossoutLogView.GUI.WindowsAuxilary
 {
     /// <summary>
-    /// Interaction logic for SettingsWindow.xaml
+    ///     Interaction logic for SettingsWindow.xaml
     /// </summary>
     public partial class SettingsWindow : MetroWindow, ILogging
     {
-        private SettingsWindowViewModel viewModel;
+        private readonly SettingsWindowViewModel viewModel;
 
         public SettingsWindow()
         {
@@ -77,7 +67,7 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
                 MaximumBodyHeight = 500,
                 ColorScheme = MetroDialogOptions.ColorScheme
             };
-            MessageDialogResult result = await this.ShowMessageAsync(
+            var result = await this.ShowMessageAsync(
                 App.GetWindowResource("Sett_DelDB_Header"),
                 App.GetWindowResource("Sett_DelDB_Message"),
                 MessageDialogStyle.AffirmativeAndNegative,
@@ -87,6 +77,7 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
                 App.SessionControlService.DeleteDatabase();
                 Environment.Exit(0);
             }
+
             e.Handled = true;
         }
 
@@ -95,35 +86,39 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
             if (e.GetPosition(this).Y <= TitleBarHeight) //prevent maximize
                 e.Handled = true;
         }
-        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             try
             {
                 Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             }
-            catch (InvalidOperationException) { }
-            catch (Win32Exception) { }
+            catch (InvalidOperationException)
+            {
+            }
+            catch (Win32Exception)
+            {
+            }
+
             e.Handled = true;
         }
 
         private void UpdateClick(object sender, RoutedEventArgs e)
         {
             if (File.Exists(Strings.UpdaterFilePath))
-            {
-
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = Strings.UpdaterFilePath,
                     Arguments = "UPDATE_LOCAL"
                 });
-            }
             e.Handled = true;
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
-        #endregion
 
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
+        #endregion
     }
 }

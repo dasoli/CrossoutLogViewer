@@ -1,9 +1,6 @@
-﻿using CrossoutLogView.GUI.Helpers;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Windows;
+using CrossoutLogView.GUI.Helpers;
 
 namespace CrossoutLogView.GUI.Events
 {
@@ -11,7 +8,7 @@ namespace CrossoutLogView.GUI.Events
 
     public class SessionClickEventArgs : RoutedEventArgs
     {
-        public SessionClickEventArgs(SessionTimes session, DateTime day) : base()
+        public SessionClickEventArgs(SessionTimes session, DateTime day)
         {
             Session = session;
             Day = day;

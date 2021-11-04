@@ -1,34 +1,31 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Data;
+using CrossoutLogView.Common;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Models;
-
-using MahApps.Metro.Converters;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for UsersListControl.xaml
+    ///     Interaction logic for UsersListControl.xaml
     /// </summary>
     public partial class UsersListControl : ILogging
     {
-        public event OpenModelViewerEventHandler OpenViewModel;
-        private UsersListControlModel viewModel;
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource),
+            typeof(ObservableCollection<UserModel>), typeof(UsersListControl),
+            new PropertyMetadata(OnItemsSourcePropertyChanged));
+
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register(nameof(SelectedItem), typeof(UserModel), typeof(UsersListControl),
+                new PropertyMetadata(OnSelectedItemPropertyChanged));
+
+        private readonly UsersListControlModel viewModel;
 
         public UsersListControl()
         {
@@ -37,13 +34,25 @@ namespace CrossoutLogView.GUI.Controls
             viewModel.PropertyChanged += OnPropertyChanged;
         }
 
-        public ObservableCollection<UserModel> ItemsSource { get => GetValue(ItemsSourceProperty) as ObservableCollection<UserModel>; set => SetValue(ItemsSourceProperty, value); }
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(ObservableCollection<UserModel>), typeof(UsersListControl), new PropertyMetadata(OnItemsSourcePropertyChanged));
+        public ObservableCollection<UserModel> ItemsSource
+        {
+            get => GetValue(ItemsSourceProperty) as ObservableCollection<UserModel>;
+            set => SetValue(ItemsSourceProperty, value);
+        }
 
-        public UserModel SelectedItem { get => GetValue(SelectedItemProperty) as UserModel; set => SetValue(SelectedItemProperty, value); }
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(UserModel), typeof(UsersListControl), new PropertyMetadata(OnSelectedItemPropertyChanged));
+        public UserModel SelectedItem
+        {
+            get => GetValue(SelectedItemProperty) as UserModel;
+            set => SetValue(SelectedItemProperty, value);
+        }
 
-        public string FilterUserName { get => viewModel.FilterUserName; set => viewModel.FilterUserName = value; }
+        public string FilterUserName
+        {
+            get => viewModel.FilterUserName;
+            set => viewModel.FilterUserName = value;
+        }
+
+        public event OpenModelViewerEventHandler OpenViewModel;
 
         private static void OnItemsSourcePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -64,12 +73,8 @@ namespace CrossoutLogView.GUI.Controls
         private static void OnSelectedItemPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             if (obj is UsersListControl ulc)
-            {
                 if (e.NewValue != null && e.NewValue is UserModel model)
-                {
                     ulc.PlayerGamesChart.ItemsSource = model.Participations;
-                }
-            }
         }
 
         private void UserOpenUserDoubleClick(object sender, OpenModelViewerEventArgs e)
@@ -90,7 +95,7 @@ namespace CrossoutLogView.GUI.Controls
             }
         }
 
-        private void ItemsSource_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView(ItemsSource).Refresh();
             CollectionViewSource.GetDefaultView(UserListViewUsers.ItemsSource).Refresh();
@@ -98,28 +103,28 @@ namespace CrossoutLogView.GUI.Controls
 
         private bool UserListFilter(object obj)
         {
-            if (String.IsNullOrEmpty(viewModel.FilterUserName)) return true;
+            if (string.IsNullOrEmpty(viewModel.FilterUserName)) return true;
             if (!(obj is UserModel ul)) return false;
             var values = ul.Name.TrimEnd().Split(' ', '-', '_');
-            for (int i = 0; i < viewModel.FiltersUserName.Length; i++)
-            {
-                if (UserListFilter(values, viewModel.FiltersUserName[i])) return true;
-            }
+            for (var i = 0; i < viewModel.FiltersUserName.Length; i++)
+                if (UserListFilter(values, viewModel.FiltersUserName[i]))
+                    return true;
             return false;
         }
 
         private static bool UserListFilter(string[] values, string match)
         {
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (values[i].Contains(match, StringComparison.InvariantCultureIgnoreCase)) return true;
-            }
+            for (var i = 0; i < values.Length; i++)
+                if (values[i].Contains(match, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
             return false;
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

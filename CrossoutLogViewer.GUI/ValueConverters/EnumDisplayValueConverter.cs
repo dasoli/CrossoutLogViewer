@@ -1,11 +1,8 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.GUI.Helpers;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
+using CrossoutLogView.Common;
+using CrossoutLogView.GUI.Helpers;
 
 namespace CrossoutLogView.GUI.ValueConverters
 {
@@ -19,6 +16,7 @@ namespace CrossoutLogView.GUI.ValueConverters
                 if (t != null && t.IsEnum)
                     return EnumHelper<DisplayMode>.GetDisplayValue((DisplayMode)value);
             }
+
             throw new NotSupportedException();
         }
 

@@ -1,25 +1,26 @@
-﻿using CrossoutLogView.Common;
-
-using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
+using CrossoutLogView.Common;
+using Newtonsoft.Json;
 
 namespace CrossoutLogView.Updater
 {
     public class FileMetadata
     {
-        public FileMetadata() { }
+        public FileMetadata()
+        {
+        }
 
-        public FileMetadata(string sha, FileInfo fileInfo) : this(sha, fileInfo.Name, fileInfo.Length) { }
+        public FileMetadata(string sha, FileInfo fileInfo) : this(sha, fileInfo.Name, fileInfo.Length)
+        {
+        }
 
         public FileMetadata(string sha, string name, long size)
         {
             if (sha is null)
                 throw new ArgumentNullException(nameof(sha));
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("Value cannot be null or empty", nameof(name));
             Sha = sha;
             Name = name;
@@ -37,7 +38,7 @@ namespace CrossoutLogView.Updater
             if (hashFunction is null) throw new ArgumentNullException(nameof(hashFunction));
             if (filePaths is null) return Array.Empty<FileMetadata>();
             var metadata = new FileMetadata[filePaths.Length];
-            Parallel.For(0, filePaths.Length, delegate (int i)
+            Parallel.For(0, filePaths.Length, delegate(int i)
             {
                 using var fs = new FileStream(filePaths[i], FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 using var br = new BinaryReader(fs);
@@ -53,13 +54,14 @@ namespace CrossoutLogView.Updater
         {
             if (metadata is null)
                 throw new ArgumentNullException(nameof(metadata));
-            if (String.IsNullOrEmpty(targetFilePath))
+            if (string.IsNullOrEmpty(targetFilePath))
                 throw new ArgumentException("Value cannot be null or or empty.", nameof(targetFilePath));
             using var fs = new FileStream(targetFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             await metadata.WriteJson(fs);
             if (!(fs is null))
                 await fs.DisposeAsync();
         }
+
         public static async Task WriteJson(this FileMetadata[] metadata, Stream stream)
         {
             if (metadata is null)
@@ -73,14 +75,15 @@ namespace CrossoutLogView.Updater
 
         public static async Task<FileMetadata[]> ReadJson(string soruceFilePath)
         {
-            if (String.IsNullOrEmpty(soruceFilePath))
+            if (string.IsNullOrEmpty(soruceFilePath))
                 throw new ArgumentException("Value cannot be null or or empty.", nameof(soruceFilePath));
-            using var fs = new FileStream(soruceFilePath, System.IO.FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var fs = new FileStream(soruceFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             var metadata = await ReadJson(fs);
             if (!(fs is null))
                 await fs.DisposeAsync();
             return metadata;
         }
+
         public static async Task<FileMetadata[]> ReadJson(Stream stream)
         {
             using var sr = new StreamReader(stream ?? throw new ArgumentNullException(nameof(stream)));

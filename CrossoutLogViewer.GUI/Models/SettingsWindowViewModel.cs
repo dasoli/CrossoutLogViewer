@@ -1,25 +1,21 @@
-﻿using ControlzEx.Theming;
-
-using CrossoutLogView.Common;
-using CrossoutLogView.Database.Data;
-using CrossoutLogView.GUI.Core;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using ControlzEx.Theming;
+using CrossoutLogView.Database.Data;
+using CrossoutLogView.GUI.Core;
 
 namespace CrossoutLogView.GUI.Models
 {
     public class SettingsWindowViewModel : WindowViewModelBase
     {
-        public SettingsWindowViewModel() : base()
+        public SettingsWindowViewModel()
         {
             AccentColors = ThemeManager.Current.Themes
                 .GroupBy(x => x.ColorScheme)
@@ -30,13 +26,20 @@ namespace CrossoutLogView.GUI.Models
             AppThemes = ThemeManager.Current.Themes
                 .GroupBy(x => x.BaseColorScheme)
                 .Select(x => x.First())
-                .Select(a => new AppThemeMenuData { Name = a.BaseColorScheme, BorderColorBrush = a.Resources["MahApps.Brushes.ThemeForeground"] as Brush, ColorBrush = a.Resources["MahApps.Brushes.ThemeBackground"] as Brush })
+                .Select(a => new AppThemeMenuData
+                {
+                    Name = a.BaseColorScheme,
+                    BorderColorBrush = a.Resources["MahApps.Brushes.ThemeForeground"] as Brush,
+                    ColorBrush = a.Resources["MahApps.Brushes.ThemeBackground"] as Brush
+                })
                 .ToList();
             AppTheme = AppThemes.First(x => x.Name == App.Theme.BaseColorScheme);
-            var resources = App.Theme.LibraryThemes.First(x => x.Origin == "MahApps.Metro").Resources.MergedDictionaries.First();
+            var resources = App.Theme.LibraryThemes.First(x => x.Origin == "MahApps.Metro").Resources.MergedDictionaries
+                .First();
             Colors = typeof(Colors).GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(x => x.Name != "Transparent")
-                .Select(x => new AccentColorMenuData { Name = x.Name, ColorBrush = new SolidColorBrush((Color)x.GetValue(null)) })
+                .Select(x => new AccentColorMenuData
+                    { Name = x.Name, ColorBrush = new SolidColorBrush((Color)x.GetValue(null)) })
                 .ToList();
         }
 
@@ -48,19 +51,47 @@ namespace CrossoutLogView.GUI.Models
 
         public List<AccentColorMenuData> Colors { get; set; }
 
-        public AccentColorMenuData TotalDamage { get => AccentColorDataFromColor(Settings.Current.TotalDamage); set => ApplySettingsColor(value.Name); }
+        public AccentColorMenuData TotalDamage
+        {
+            get => AccentColorDataFromColor(Settings.Current.TotalDamage);
+            set => ApplySettingsColor(value.Name);
+        }
 
-        public AccentColorMenuData CriticalDamage { get => AccentColorDataFromColor(Settings.Current.CriticalDamage); set => ApplySettingsColor(value.Name); }
+        public AccentColorMenuData CriticalDamage
+        {
+            get => AccentColorDataFromColor(Settings.Current.CriticalDamage);
+            set => ApplySettingsColor(value.Name);
+        }
 
-        public AccentColorMenuData ArmorDamage { get => AccentColorDataFromColor(Settings.Current.ArmorDamage); set => ApplySettingsColor(value.Name); }
+        public AccentColorMenuData ArmorDamage
+        {
+            get => AccentColorDataFromColor(Settings.Current.ArmorDamage);
+            set => ApplySettingsColor(value.Name);
+        }
 
-        public AccentColorMenuData Suicide { get => AccentColorDataFromColor(Settings.Current.Suicide); set => ApplySettingsColor(value.Name); }
+        public AccentColorMenuData Suicide
+        {
+            get => AccentColorDataFromColor(Settings.Current.Suicide);
+            set => ApplySettingsColor(value.Name);
+        }
 
-        public AccentColorMenuData Despawn { get => AccentColorDataFromColor(Settings.Current.Despawn); set => ApplySettingsColor(value.Name); }
+        public AccentColorMenuData Despawn
+        {
+            get => AccentColorDataFromColor(Settings.Current.Despawn);
+            set => ApplySettingsColor(value.Name);
+        }
 
-        public AccentColorMenuData TeamWon { get => AccentColorDataFromColor(Settings.Current.TeamWon); set => ApplySettingsColor(value.Name, true); }
+        public AccentColorMenuData TeamWon
+        {
+            get => AccentColorDataFromColor(Settings.Current.TeamWon);
+            set => ApplySettingsColor(value.Name, true);
+        }
 
-        public AccentColorMenuData TeamLost { get => AccentColorDataFromColor(Settings.Current.TeamLost); set => ApplySettingsColor(value.Name, true); }
+        public AccentColorMenuData TeamLost
+        {
+            get => AccentColorDataFromColor(Settings.Current.TeamLost);
+            set => ApplySettingsColor(value.Name, true);
+        }
 
         public AppThemeMenuData AppTheme { get; set; }
 
@@ -93,7 +124,8 @@ namespace CrossoutLogView.GUI.Models
             OnPropertyChanged(nameof(TeamLost));
         }
 
-        private static void ApplySettingsColor(string color, bool setAlpha = false, [CallerMemberName] string resourceKey = "")
+        private static void ApplySettingsColor(string color, bool setAlpha = false,
+            [CallerMemberName] string resourceKey = "")
         {
             try
             {
@@ -102,10 +134,13 @@ namespace CrossoutLogView.GUI.Models
                 if (Application.Current.Resources.Contains(resourceKey))
                 {
                     Application.Current.Resources[resourceKey] = new SolidColorBrush(c);
-                    typeof(Settings).GetProperty(resourceKey).SetValue(Settings.Current, c.ToString(CultureInfo.InvariantCulture));
+                    typeof(Settings).GetProperty(resourceKey)
+                        .SetValue(Settings.Current, c.ToString(CultureInfo.InvariantCulture));
                 }
             }
-            catch (FormatException) { }
+            catch (FormatException)
+            {
+            }
         }
 
         private AccentColorMenuData AccentColorDataFromColor(string color)
@@ -120,17 +155,17 @@ namespace CrossoutLogView.GUI.Models
 
     public class AccentColorMenuData
     {
-        public string Name { get; set; }
-
-        public Brush BorderColorBrush { get; set; }
-
-        public Brush ColorBrush { get; set; }
-
         public AccentColorMenuData()
         {
             ChangeAccentCommand = new SimpleCommand(o => true, DoChangeTheme);
             BorderColorBrush = App.Theme.Resources["MahApps.Brushes.Gray5"] as Brush;
         }
+
+        public string Name { get; set; }
+
+        public Brush BorderColorBrush { get; set; }
+
+        public Brush ColorBrush { get; set; }
 
         public ICommand ChangeAccentCommand { get; }
 
@@ -158,7 +193,12 @@ namespace CrossoutLogView.GUI.Models
 
         public static AppThemeMenuData GetCurrentTheme()
         {
-            return new AppThemeMenuData { Name = App.Theme.BaseColorScheme, BorderColorBrush = App.Theme.Resources["MahApps.Brushes.ThemeForeground"] as Brush, ColorBrush = App.Theme.Resources["MahApps.Brushes.ThemeBackground"] as Brush };
+            return new AppThemeMenuData
+            {
+                Name = App.Theme.BaseColorScheme,
+                BorderColorBrush = App.Theme.Resources["MahApps.Brushes.ThemeForeground"] as Brush,
+                ColorBrush = App.Theme.Resources["MahApps.Brushes.ThemeBackground"] as Brush
+            };
         }
     }
 }

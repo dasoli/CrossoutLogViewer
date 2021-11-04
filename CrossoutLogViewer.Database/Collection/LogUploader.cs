@@ -1,24 +1,22 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Database.Connection;
-using CrossoutLogView.Database.Events;
-using CrossoutLogView.Log;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CrossoutLogView.Common;
+using CrossoutLogView.Database.Connection;
+using CrossoutLogView.Database.Events;
+using CrossoutLogView.Log;
 
 namespace CrossoutLogView.Database.Collection
 {
     public class LogUploader : IDisposable
     {
+        public static LogUploadEventEventHandler LogUploadEvent;
+        private readonly List<ILogEntry> _combined = new List<ILogEntry>();
         private readonly LogCollector collector;
         private FileStream fileStream;
+        private long linePosition;
         private StreamReader streamReader;
-        private long linePosition = 0;
-        private readonly List<ILogEntry> _combined = new List<ILogEntry>();
-
-        public static LogUploadEventEventHandler LogUploadEvent;
 
         public LogUploader(string logPath, UploaderOperatingMode operatingMode = UploaderOperatingMode.Incremental)
         {
@@ -34,7 +32,11 @@ namespace CrossoutLogView.Database.Collection
 
         public UploaderOperatingMode OperatingMode { get; }
 
-        public IEnumerable<ILogEntry> Combined { get => OperatingMode == UploaderOperatingMode.Unchecked ? _combined : throw new InvalidOperationException(); }
+        public IEnumerable<ILogEntry> Combined => OperatingMode == UploaderOperatingMode.Unchecked
+            ? _combined
+            : throw new InvalidOperationException();
+
+        public string FilePath => (streamReader.BaseStream as FileStream).Name;
 
         public void Reposition(long linePos)
         {
@@ -48,19 +50,22 @@ namespace CrossoutLogView.Database.Collection
                 streamReader = sr;
                 linePosition = 0;
             }
+
             //skip to desired line
             while (linePosition < linePos && streamReader.ReadLine() != null) linePosition++;
         }
 
         public int Parse()
         {
-            int read = 0;
+            var read = 0;
             string lineStr;
             while ((lineStr = streamReader.ReadLine()) != null)
             {
-                if (collector.TryAdd(lineStr) && OperatingMode == UploaderOperatingMode.Unchecked) _combined.Add(collector.Current);
+                if (collector.TryAdd(lineStr) && OperatingMode == UploaderOperatingMode.Unchecked)
+                    _combined.Add(collector.Current);
                 read++;
             }
+
             linePosition += read;
             return read;
         }
@@ -68,7 +73,9 @@ namespace CrossoutLogView.Database.Collection
         public void Upload()
         {
             using var logCon = new LogConnection();
-            var oldTimeStamp = OperatingMode == UploaderOperatingMode.Incremental ? logCon.RequestNewestLogEntryTimeStamp() : 0;
+            var oldTimeStamp = OperatingMode == UploaderOperatingMode.Incremental
+                ? logCon.RequestNewestLogEntryTimeStamp()
+                : 0;
             //upload collected logs
             Task.WaitAll(Task.Run(async delegate
             {
@@ -89,15 +96,24 @@ namespace CrossoutLogView.Database.Collection
                 trans.Commit();
             }));
             if (OperatingMode == UploaderOperatingMode.Incremental)
-                LogUploadEvent?.Invoke(this, new LogUploadEventArgs(new DateTime(oldTimeStamp), new DateTime(logCon.RequestNewestLogEntryTimeStamp())));
+                LogUploadEvent?.Invoke(this,
+                    new LogUploadEventArgs(new DateTime(oldTimeStamp),
+                        new DateTime(logCon.RequestNewestLogEntryTimeStamp())));
             logCon.Dispose();
             collector.ClearAll();
         }
 
-        public string FilePath => (streamReader.BaseStream as FileStream).Name;
+        private class TimeStampSorting : IComparer<ILogEntry>
+        {
+            int IComparer<ILogEntry>.Compare(ILogEntry x, ILogEntry y)
+            {
+                return x.TimeStamp.CompareTo(y.TimeStamp);
+            }
+        }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+
+        private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -108,9 +124,11 @@ namespace CrossoutLogView.Database.Collection
                     collector.Dispose();
                     DisposeStreams();
                 }
+
                 disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(true);
@@ -121,14 +139,7 @@ namespace CrossoutLogView.Database.Collection
             if (fileStream != null) fileStream.Dispose();
             if (streamReader != null) streamReader.Dispose();
         }
-        #endregion
 
-        private class TimeStampSorting : IComparer<ILogEntry>
-        {
-            int IComparer<ILogEntry>.Compare(ILogEntry x, ILogEntry y)
-            {
-                return x.TimeStamp.CompareTo(y.TimeStamp);
-            }
-        }
+        #endregion
     }
 }

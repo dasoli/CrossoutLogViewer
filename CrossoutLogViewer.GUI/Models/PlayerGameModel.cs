@@ -1,12 +1,8 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.Generic;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Windows.Media;
 
 namespace CrossoutLogView.GUI.Models
 {
@@ -16,7 +12,7 @@ namespace CrossoutLogView.GUI.Models
         {
             Game = new GameModel();
             Player = new PlayerModel();
-            Map = String.Empty;
+            Map = string.Empty;
         }
 
         public PlayerGameModel(GameModel game, PlayerModel player)
@@ -69,11 +65,17 @@ namespace CrossoutLogView.GUI.Models
 
     public sealed class PlayerGameModelScoreDescending : IComparer<PlayerGameModel>
     {
-        int IComparer<PlayerGameModel>.Compare(PlayerGameModel x, PlayerGameModel y) => y.Score.CompareTo(x.Score);
+        int IComparer<PlayerGameModel>.Compare(PlayerGameModel x, PlayerGameModel y)
+        {
+            return y.Score.CompareTo(x.Score);
+        }
     }
 
     public sealed class PlayerGameModelStartTimeDescending : IComparer<PlayerGameModel>
     {
-        int IComparer<PlayerGameModel>.Compare(PlayerGameModel x, PlayerGameModel y) => y.StartTime.CompareTo(x.StartTime);
+        int IComparer<PlayerGameModel>.Compare(PlayerGameModel x, PlayerGameModel y)
+        {
+            return y.StartTime.CompareTo(x.StartTime);
+        }
     }
 }

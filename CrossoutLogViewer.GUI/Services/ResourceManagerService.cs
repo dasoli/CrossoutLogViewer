@@ -1,30 +1,22 @@
 ﻿/* 
  * All credit to GrumpyDev (Steven Robbins)
  */
-using CrossoutLogView.GUI.Core;
-using CrossoutLogView.GUI.Events;
 
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Threading;
+using CrossoutLogView.GUI.Core;
+using CrossoutLogView.GUI.Events;
 
 namespace CrossoutLogView.GUI.Services
 {
     public static class ResourceManagerService
     {
-        private static Dictionary<string, ResourceManager> _managers;
-
-        public static event ValueChangedEventHandler<Locale> LocaleChanged;
+        private static readonly Dictionary<string, ResourceManager> _managers;
 
         /// <summary>
-        /// Current application locale
-        /// </summary>
-        public static Locale CurrentLocale { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the ResourceManager class.
+        ///     Initializes a new instance of the ResourceManager class.
         /// </summary>
         static ResourceManagerService()
         {
@@ -35,17 +27,23 @@ namespace CrossoutLogView.GUI.Services
         }
 
         /// <summary>
-        /// Retreives a string resource with the given key from the given
-        /// resource manager.
-        /// 
-        /// Will load the string relevant to the current culture.
+        ///     Current application locale
+        /// </summary>
+        public static Locale CurrentLocale { get; private set; }
+
+        public static event ValueChangedEventHandler<Locale> LocaleChanged;
+
+        /// <summary>
+        ///     Retreives a string resource with the given key from the given
+        ///     resource manager.
+        ///     Will load the string relevant to the current culture.
         /// </summary>
         /// <param name="managerName">Name of the ResourceManager</param>
         /// <param name="resourceKey">Resource to lookup</param>
         /// <returns></returns>
         public static string GetResourceString(string managerName, string resourceKey)
         {
-            string resource = String.Empty;
+            var resource = string.Empty;
 
             if (_managers.TryGetValue(managerName, out var manager))
                 resource = manager.GetString(resourceKey);
@@ -54,24 +52,24 @@ namespace CrossoutLogView.GUI.Services
         }
 
         /// <summary>
-        /// Changes the current locale
+        ///     Changes the current locale
         /// </summary>
         /// <param name="newLocaleName">IETF locale name (e.g. en-US, en-GB)</param>
         public static void ChangeLocale(string newLocaleName)
         {
-            CultureInfo newCultureInfo = new CultureInfo(newLocaleName);
+            var newCultureInfo = new CultureInfo(newLocaleName);
             Thread.CurrentThread.CurrentCulture = newCultureInfo;
             Thread.CurrentThread.CurrentUICulture = newCultureInfo;
 
-            Locale newLocale = new Locale() { Name = newLocaleName, RTL = newCultureInfo.TextInfo.IsRightToLeft };
-            Locale oldLocale = CurrentLocale?.Clone();
+            var newLocale = new Locale { Name = newLocaleName, RTL = newCultureInfo.TextInfo.IsRightToLeft };
+            var oldLocale = CurrentLocale?.Clone();
             CurrentLocale = newLocale;
 
             LocaleChanged?.Invoke(null, new ValueChangedEventArgs<Locale>(oldLocale, newLocale));
         }
 
         /// <summary>
-        /// Fires the LocaleChange event to reload bindings
+        ///     Fires the LocaleChange event to reload bindings
         /// </summary>
         public static void Refresh()
         {
@@ -79,7 +77,7 @@ namespace CrossoutLogView.GUI.Services
         }
 
         /// <summary>
-        /// Register a ResourceManager, does not fire a refresh
+        ///     Register a ResourceManager, does not fire a refresh
         /// </summary>
         /// <param name="managerName">Name to store the manager under, used with GetResourceString/UnregisterManager</param>
         /// <param name="manager">ResourceManager to store</param>
@@ -89,7 +87,7 @@ namespace CrossoutLogView.GUI.Services
         }
 
         /// <summary>
-        /// Register a ResourceManager
+        ///     Register a ResourceManager
         /// </summary>
         /// <param name="managerName">Name to store the manager under, used with GetResourceString/UnregisterManager</param>
         /// <param name="manager">ResourceManager to store</param>
@@ -106,7 +104,7 @@ namespace CrossoutLogView.GUI.Services
         }
 
         /// <summary>
-        /// Remove a ResourceManager
+        ///     Remove a ResourceManager
         /// </summary>
         /// <param name="name">Name of the manager to remove</param>
         public static void UnregisterManager(string name)

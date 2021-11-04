@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:CrossoutLogView.GUI.Controls"
              xmlns:helpers="clr-namespace:CrossoutLogView.GUI.Helpers"
              mc:Ignorable="d"
-             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              d:DesignHeight="450"
              d:DesignWidth="800">
     <UserControl.Resources>
@@ -24,9 +23,9 @@
                     <DataTemplate>
                         <TextBlock Margin="4,6,0,6"
                                    VerticalAlignment="Center">
-                        <Run Text="{Binding Name, Mode=OneWay}" />
-                        <Run Text="•" />
-                        <Run Text="{Binding GamesPlayed}" />
+                            <Run Text="{Binding Name, Mode=OneWay}" />
+                            <Run Text="•" />
+                            <Run Text="{Binding GamesPlayed}" />
                         </TextBlock>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -40,7 +39,7 @@
         <Grid Grid.Column="2"
               Grid.RowSpan="2">
             <local:UserOverview x:Name="UserOverview"
-                                Background="Transparent"/>
+                                Background="Transparent" />
             <local:ScrollableHeaderedControl x:Name="ScrollableHeaderedControl_Scroller"
                                              Grid.Row="1">
                 <local:ScrollableHeaderedControl.HeaderContent>
@@ -62,8 +61,8 @@
                         </Grid>
                     </GroupBox>
                 </local:ScrollableHeaderedControl.HeaderContent>
-                
-                <local:PlayerGamesDataGrid/>
+
+                <local:PlayerGamesDataGrid />
             </local:ScrollableHeaderedControl>
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto" />
@@ -72,7 +71,7 @@
         </Grid>
         <GridSplitter Style="{DynamicResource MahApps.Styles.GridSplitter}"
                       Grid.Column="1"
-                      Grid.RowSpan="2"/>
+                      Grid.RowSpan="2" />
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="170" MaxWidth="250" />
             <ColumnDefinition Width="5" />

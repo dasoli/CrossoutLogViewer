@@ -3,10 +3,8 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:UserControls="clr-namespace:CrossoutLogView.GUI.Controls"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-                      xmlns:local="clr-namespace:CrossoutLogView.GUI"
                       mc:Ignorable="d"
                       Style="{DynamicResource MetroWindowTitlebarColorStyle}"
                       Title="Crossout Log Viewer: Launcher"
@@ -127,11 +125,11 @@
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    Grid.Row="1">
-            <Run Text="Copyright © 2020 " 
-                 FontSize="16"/>
+            <Run Text="Copyright © 2020 "
+                 FontSize="16" />
             <Run Text="ProphetLamb" />
-            <Run Text=" under the MIT licence." 
-                 FontSize="16"/>
+            <Run Text=" under the MIT licence."
+                 FontSize="16" />
         </TextBlock>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

@@ -1,34 +1,17 @@
-﻿using ControlzEx.Theming;
-
+﻿using System;
+using System.Windows;
 using CrossoutLogView.Common;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.GUI.Navigation;
-using CrossoutLogView.GUI.Services;
-
 using MahApps.Metro.Controls;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
+using NLog;
 
 namespace CrossoutLogView.GUI.WindowsAuxilary
 {
     /// <summary>
-    /// Interaction logic for NavigationWindow.xaml
+    ///     Interaction logic for NavigationWindow.xaml
     /// </summary>
     public partial class NavigationWindow : MetroWindow, ILogging
     {
@@ -82,8 +65,10 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

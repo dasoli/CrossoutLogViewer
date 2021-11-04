@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Principal;
-using System.Text;
 
 namespace CrossoutLogView.Common
 {
@@ -11,7 +8,7 @@ namespace CrossoutLogView.Common
     {
         public static bool CanRWXByDummy()
         {
-            bool success = true;
+            var success = true;
             try
             {
                 var dummyPath = @".\.dummy";
@@ -21,8 +18,15 @@ namespace CrossoutLogView.Common
                 File.ReadAllText(dummyPath);
                 File.Delete(dummyPath);
             }
-            catch (IOException) { success = false; }
-            catch (UnauthorizedAccessException) { success = false; }
+            catch (IOException)
+            {
+                success = false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                success = false;
+            }
+
             return success;
         }
 
@@ -33,8 +37,8 @@ namespace CrossoutLogView.Common
                 CreateNoWindow = false, // Hide CLI window
                 FileName = @"cmd.exe",
                 Verb = "runas", // Run with elevated rights
-                Arguments = String.Concat("/noprofile /user:Administrator /C ", Strings.ScriptFolderPermissions, " \"",
-                Environment.CurrentDirectory, "\"") // Absolute path to the current directory
+                Arguments = string.Concat("/noprofile /user:Administrator /C ", Strings.ScriptFolderPermissions, " \"",
+                    Environment.CurrentDirectory, "\"") // Absolute path to the current directory
             });
         }
     }

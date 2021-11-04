@@ -1,16 +1,14 @@
-﻿using System;
-
-namespace CrossoutLogView.Statistics
+﻿namespace CrossoutLogView.Statistics
 {
     public abstract class WeaponBase
     {
-        public string Name;
-        public double CriticalDamage;
         public double ArmorDamage;
+        public double CriticalDamage;
+        public string Name;
 
         protected WeaponBase()
         {
-            Name = String.Empty;
+            Name = string.Empty;
         }
     }
 }

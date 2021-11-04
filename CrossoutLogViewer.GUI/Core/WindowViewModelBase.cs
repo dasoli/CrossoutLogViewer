@@ -1,17 +1,14 @@
-﻿using CrossoutLogView.Database.Data;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Threading;
+﻿using System;
 using System.Threading.Tasks;
+using System.Windows.Threading;
+using CrossoutLogView.Database.Data;
+using CrossoutLogView.Database.Events;
 
 namespace CrossoutLogView.GUI.Core
 {
     public class WindowViewModelBase : CollectionViewModelBase
     {
         private bool _colorWindowTitlebar = Settings.Current.ColorWindowTitlebar;
-        public event EventHandler Initialized;
 
         public WindowViewModelBase()
         {
@@ -33,7 +30,9 @@ namespace CrossoutLogView.GUI.Core
             }
         }
 
-        private void Settings_SettingsPropertyChanged(Settings sender, Database.Events.SettingsChangedEventArgs e)
+        public event EventHandler Initialized;
+
+        private void Settings_SettingsPropertyChanged(Settings sender, SettingsChangedEventArgs e)
         {
             if (sender != null && e != null && e.Name == nameof(Settings.ColorWindowTitlebar))
             {
@@ -55,6 +54,8 @@ namespace CrossoutLogView.GUI.Core
             UpdateCollectionsSafe();
         }
 
-        protected override void UpdateCollections() { }
+        protected override void UpdateCollections()
+        {
+        }
     }
 }

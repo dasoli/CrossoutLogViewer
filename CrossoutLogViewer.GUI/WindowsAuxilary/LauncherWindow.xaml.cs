@@ -1,31 +1,30 @@
-﻿using ControlzEx.Theming;
-
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using ControlzEx.Theming;
 using CrossoutLogView.Common;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
-
 using MahApps.Metro.Controls;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using NLog;
 
 namespace CrossoutLogView.GUI.WindowsAuxilary
 {
     /// <summary>
-    /// Interaction logic for LauncherWindow.xaml
+    ///     Interaction logic for LauncherWindow.xaml
     /// </summary>
     public partial class LauncherWindow : MetroWindow, ILogging
     {
         private LoadingWindow loadingWindow;
+
         public LauncherWindow()
         {
             logger.TraceResource("WinInit");
             InitializeComponent();
-            if (!String.IsNullOrEmpty(Settings.Current.BaseColorScheme) && !String.IsNullOrEmpty(Settings.Current.ColorScheme))
-                App.Theme = ThemeManager.Current.ChangeTheme(App.Current, Settings.Current.BaseColorScheme, Settings.Current.ColorScheme);
+            if (!string.IsNullOrEmpty(Settings.Current.BaseColorScheme) &&
+                !string.IsNullOrEmpty(Settings.Current.ColorScheme))
+                App.Theme = ThemeManager.Current.ChangeTheme(Application.Current, Settings.Current.BaseColorScheme,
+                    Settings.Current.ColorScheme);
             DataContext = new WindowViewModelBase();
             logger.TraceResource("WinInitD");
         }
@@ -41,12 +40,10 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
             new LiveTrackingWindow().Show();
             Close();
         }
+
         private void SettingsClick(object sender, RoutedEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(delegate
-            {
-                new SettingsWindow().ShowDialog();
-            }));
+            Dispatcher.BeginInvoke(new Action(delegate { new SettingsWindow().ShowDialog(); }));
         }
 
         private void SessionReviewClick(object sender, RoutedEventArgs e)
@@ -72,8 +69,10 @@ namespace CrossoutLogView.GUI.WindowsAuxilary
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

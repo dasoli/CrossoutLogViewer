@@ -17,11 +17,30 @@ namespace CrossoutLogView.Database.Data
             FileSize = fileSize;
         }
 
-        public override bool Equals(object obj) => obj is LogConfig state && Equals(state);
-        public bool Equals(LogConfig other) => Path == other.Path && DateTime == other.DateTime && Position == other.Position && FileSize == other.FileSize;
-        public override int GetHashCode() => HashCode.Combine(Path, DateTime, Position, FileSize);
+        public override bool Equals(object obj)
+        {
+            return obj is LogConfig state && Equals(state);
+        }
 
-        public static bool operator ==(LogConfig left, LogConfig right) => left.Equals(right);
-        public static bool operator !=(LogConfig left, LogConfig right) => !(left == right);
+        public bool Equals(LogConfig other)
+        {
+            return Path == other.Path && DateTime == other.DateTime && Position == other.Position &&
+                   FileSize == other.FileSize;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Path, DateTime, Position, FileSize);
+        }
+
+        public static bool operator ==(LogConfig left, LogConfig right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(LogConfig left, LogConfig right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -1,8 +1,9 @@
 ﻿/* 
  * All credit to GrumpyDev (Steven Robbins)
  */
-using System;
+
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 
 namespace CrossoutLogView.GUI.Helpers
@@ -12,8 +13,8 @@ namespace CrossoutLogView.GUI.Helpers
         private static bool? _isInDesignMode;
 
         /// <summary>
-        /// Gets a value indicating whether the control is in design mode (running in Blend
-        /// or Visual Studio).
+        ///     Gets a value indicating whether the control is in design mode (running in Blend
+        ///     or Visual Studio).
         /// </summary>
         public static bool IsInDesignModeStatic
         {
@@ -25,16 +26,17 @@ namespace CrossoutLogView.GUI.Helpers
                     _isInDesignMode = DesignerProperties.IsInDesignTool;
 #else
                     var prop = DesignerProperties.IsInDesignModeProperty;
-                    _isInDesignMode = (bool)DependencyPropertyDescriptor.FromProperty(prop, typeof(FrameworkElement)).Metadata.DefaultValue;
+                    _isInDesignMode = (bool)DependencyPropertyDescriptor.FromProperty(prop, typeof(FrameworkElement))
+                        .Metadata.DefaultValue;
 
                     if (!_isInDesignMode.Value)
-                        if (System.Diagnostics.Process.GetCurrentProcess().ProcessName.StartsWith(@"devenv"))
+                        if (Process.GetCurrentProcess().ProcessName.StartsWith(@"devenv"))
                             _isInDesignMode = true;
 #endif
                 }
+
                 return _isInDesignMode.Value;
             }
         }
-
     }
 }

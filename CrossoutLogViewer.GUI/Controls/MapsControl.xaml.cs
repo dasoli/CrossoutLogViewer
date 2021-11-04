@@ -1,40 +1,38 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using CrossoutLogView.Common;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media.Imaging;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for MapsControl.xaml
+    ///     Interaction logic for MapsControl.xaml
     /// </summary>
     public partial class MapsControl : ILogging
     {
+        public static readonly DependencyProperty MapsProperty = DependencyProperty.Register(nameof(Maps),
+            typeof(ObservableCollection<MapModel>), typeof(MapsControl), new PropertyMetadata(OnMapsPropertyChanged));
+
         private GameFilter filter = new GameFilter(GameMode.All);
         private MapModel selectedItem;
-
-        public event OpenModelViewerEventHandler OpenViewModel;
 
         public MapsControl()
         {
             InitializeComponent();
             PlayerGamesDataGrid = ScrollableHeaderedControl_Scroller.Content as PlayerGamesDataGrid;
             // Hide map column
-            PlayerGamesDataGrid.Columns.FirstOrDefault(x => String.Equals(x.Header as string, "Map", StringComparison.InvariantCultureIgnoreCase)).Visibility = Visibility.Hidden;
+            PlayerGamesDataGrid.Columns.FirstOrDefault(x =>
+                    string.Equals(x.Header as string, "Map", StringComparison.InvariantCultureIgnoreCase)).Visibility =
+                Visibility.Hidden;
             // Passthought OpenViewModel event
             PlayerGamesDataGrid.OpenViewModel += (s, e) => OpenViewModel?.Invoke(s, e);
         }
@@ -42,10 +40,16 @@ namespace CrossoutLogView.GUI.Controls
         public PlayerGamesDataGrid PlayerGamesDataGrid { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ObservableCollection{MapModel}"/> used to generate the selection of the <see cref="MapsControl"/>.
+        ///     Gets or sets the <see cref="ObservableCollection{MapModel}" /> used to generate the selection of the
+        ///     <see cref="MapsControl" />.
         /// </summary>
-        public ObservableCollection<MapModel> Maps { get => GetValue(MapsProperty) as ObservableCollection<MapModel>; set => SetValue(MapsProperty, value); }
-        public static readonly DependencyProperty MapsProperty = DependencyProperty.Register(nameof(Maps), typeof(ObservableCollection<MapModel>), typeof(MapsControl), new PropertyMetadata(OnMapsPropertyChanged));
+        public ObservableCollection<MapModel> Maps
+        {
+            get => GetValue(MapsProperty) as ObservableCollection<MapModel>;
+            set => SetValue(MapsProperty, value);
+        }
+
+        public event OpenModelViewerEventHandler OpenViewModel;
 
         private static void OnMapsPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -89,8 +93,10 @@ namespace CrossoutLogView.GUI.Controls
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

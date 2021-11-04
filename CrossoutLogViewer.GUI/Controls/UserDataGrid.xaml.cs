@@ -1,31 +1,19 @@
-﻿using CrossoutLogView.GUI.Core;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.GUI.Models;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for UserListView.xaml
+    ///     Interaction logic for UserListView.xaml
     /// </summary>
     public partial class UserDataGrid : ILogging
     {
-        public event OpenModelViewerEventHandler OpenViewModel;
-
         public UserDataGrid()
         {
             InitializeComponent();
@@ -35,6 +23,8 @@ namespace CrossoutLogView.GUI.Controls
                 column.IsReadOnly = true;
             }
         }
+
+        public event OpenModelViewerEventHandler OpenViewModel;
 
         private void OpenUserMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -55,8 +45,10 @@ namespace CrossoutLogView.GUI.Controls
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

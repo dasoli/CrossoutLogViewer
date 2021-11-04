@@ -1,42 +1,52 @@
-﻿using CrossoutLogView.GUI.Events;
-using CrossoutLogView.GUI.Helpers;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using CrossoutLogView.GUI.Events;
+using CrossoutLogView.GUI.Helpers;
 
 namespace CrossoutLogView.GUI.Controls.SessionCalendar
 {
     /// <summary>
-    /// Interaction logic for DayButton.xaml
+    ///     Interaction logic for DayButton.xaml
     /// </summary>
     public partial class DayButton : UserControl
     {
-        public event SessionClickEventHandler SessionClick;
+        public static readonly DependencyProperty DayProperty = DependencyProperty.Register(nameof(Day),
+            typeof(DateTime), typeof(DayButton), new PropertyMetadata(DateTime.MinValue, OnDayPropertyChanged));
+
+        protected static readonly DependencyPropertyKey SessionsPropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(Sessions), typeof(SessionTimes), typeof(DayButton),
+                new PropertyMetadata(SessionTimes.None, OnSessionsPropertyChanged));
+
+        public static readonly DependencyProperty SessionsProperty = SessionsPropertyKey.DependencyProperty;
+
+        public static readonly DependencyProperty HighliightProperty =
+            DependencyProperty.Register(nameof(Highlight), typeof(bool), typeof(DayButton));
 
         public DayButton()
         {
             InitializeComponent();
         }
 
-        public DateTime Day { get => (DateTime)GetValue(DayProperty); set => SetValue(DayProperty, value); }
-        public static readonly DependencyProperty DayProperty = DependencyProperty.Register(nameof(Day), typeof(DateTime), typeof(DayButton), new PropertyMetadata(DateTime.MinValue, OnDayPropertyChanged));
+        public DateTime Day
+        {
+            get => (DateTime)GetValue(DayProperty);
+            set => SetValue(DayProperty, value);
+        }
 
-        public SessionTimes Sessions { get => (SessionTimes)GetValue(SessionsProperty); protected set => SetValue(SessionsPropertyKey, value); }
-        protected static readonly DependencyPropertyKey SessionsPropertyKey = DependencyProperty.RegisterReadOnly(nameof(Sessions), typeof(SessionTimes), typeof(DayButton), new PropertyMetadata(SessionTimes.None, OnSessionsPropertyChanged));
-        public static readonly DependencyProperty SessionsProperty = SessionsPropertyKey.DependencyProperty;
+        public SessionTimes Sessions
+        {
+            get => (SessionTimes)GetValue(SessionsProperty);
+            protected set => SetValue(SessionsPropertyKey, value);
+        }
 
-        public bool Highlight { get => (bool)GetValue(HighliightProperty); set => SetValue(HighliightProperty, value); }
-        public static readonly DependencyProperty HighliightProperty = DependencyProperty.Register(nameof(Highlight), typeof(bool), typeof(DayButton));
+        public bool Highlight
+        {
+            get => (bool)GetValue(HighliightProperty);
+            set => SetValue(HighliightProperty, value);
+        }
+
+        public event SessionClickEventHandler SessionClick;
 
         private static void OnDayPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
@@ -55,9 +65,15 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
             if (obj is DayButton cntr && e.NewValue is SessionTimes newValue)
             {
                 // Show buttons specified by newValue
-                cntr.ButtonNight.Visibility = (newValue & SessionTimes.Night) == SessionTimes.Night ? Visibility.Visible : Visibility.Collapsed;
-                cntr.ButtonNoon.Visibility = (newValue & SessionTimes.Noon) == SessionTimes.Noon ? Visibility.Visible : Visibility.Collapsed;
-                cntr.ButtonAfternoon.Visibility = (newValue & SessionTimes.Afternoon) == SessionTimes.Afternoon ? Visibility.Visible : Visibility.Collapsed;
+                cntr.ButtonNight.Visibility = (newValue & SessionTimes.Night) == SessionTimes.Night
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+                cntr.ButtonNoon.Visibility = (newValue & SessionTimes.Noon) == SessionTimes.Noon
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+                cntr.ButtonAfternoon.Visibility = (newValue & SessionTimes.Afternoon) == SessionTimes.Afternoon
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
             }
         }
 

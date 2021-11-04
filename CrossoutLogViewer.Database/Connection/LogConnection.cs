@@ -1,54 +1,63 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Database.Data;
-using CrossoutLogView.Database.Reflection;
-using CrossoutLogView.Log;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
+using CrossoutLogView.Common;
+using CrossoutLogView.Database.Data;
+using CrossoutLogView.Database.Reflection;
+using CrossoutLogView.Log;
 using static CrossoutLogView.Common.SQLiteFormat;
 
 namespace CrossoutLogView.Database.Connection
 {
     public class LogConnection : ConnectionBase
     {
-        private static string TimeStampFieldName => nameof(ILogEntry.TimeStamp).ToLowerInvariant();
-
-        public LogConnection() : base()
+        public LogConnection()
         {
             DatabaseTableTypes = ILogEntry.Implementations;
         }
 
-        protected override object InsertVariableHandler(in object obj, in VariableInfo variableInfo) => null;
+        private static string TimeStampFieldName => nameof(ILogEntry.TimeStamp).ToLowerInvariant();
+
+        protected override object InsertVariableHandler(in object obj, in VariableInfo variableInfo)
+        {
+            return null;
+        }
 
         public List<ILogEntry> RequestAll(long start, long end)
         {
             var result = new List<ILogEntry>();
-            Parallel.ForEach(DatabaseTableTypes, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
-                delegate (Type t)
-            {
-                var command = GetDateTimeRangeRequest(t, start, end);
-                var partial = ExecuteRequest(t, command).Cast<ILogEntry>();
-                lock (result) result.AddRange(partial);
-            });
+            Parallel.ForEach(DatabaseTableTypes,
+                new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
+                delegate(Type t)
+                {
+                    var command = GetDateTimeRangeRequest(t, start, end);
+                    var partial = ExecuteRequest(t, command).Cast<ILogEntry>();
+                    lock (result)
+                    {
+                        result.AddRange(partial);
+                    }
+                });
             return result;
         }
+
         public List<ILogEntry> RequestAll(long start)
         {
             var result = new List<ILogEntry>();
-            Parallel.ForEach(DatabaseTableTypes, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
-                delegate (Type t)
-            {
-                var command = GetDateTimeRangeRequest(t, start);
-                var partial = ExecuteRequest(t, command).Cast<ILogEntry>();
-                lock (result) result.AddRange(partial);
-            });
+            Parallel.ForEach(DatabaseTableTypes,
+                new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
+                delegate(Type t)
+                {
+                    var command = GetDateTimeRangeRequest(t, start);
+                    var partial = ExecuteRequest(t, command).Cast<ILogEntry>();
+                    lock (result)
+                    {
+                        result.AddRange(partial);
+                    }
+                });
             return result;
         }
 
@@ -69,23 +78,27 @@ namespace CrossoutLogView.Database.Connection
         public T RequestLatest<T>() where T : ILogEntry, new()
         {
             var name = nameof(T);
-            var command = String.Concat("SELECT a.* FROM ", name, " a INNER JOIN (SELECT ROWID, MAX(timestamp) timestamp FROM ", name, ") b ON a.ROWID == b.ROWID AND a.timestamp = b.timestamp");
+            var command = string.Concat("SELECT a.* FROM ", name,
+                " a INNER JOIN (SELECT ROWID, MAX(timestamp) timestamp FROM ", name,
+                ") b ON a.ROWID == b.ROWID AND a.timestamp = b.timestamp");
             return ExecuteRequestSingleObject<T>(command);
         }
 
         public long RequestNewestLogEntryTimeStamp()
         {
-            var format = "SELECT a.timestamp FROM {0} a INNER JOIN (SELECT ROWID, MAX(timestamp) timestamp FROM {0}) b ON a.ROWID == b.ROWID AND a.timestamp = b.timestamp";
+            var format =
+                "SELECT a.timestamp FROM {0} a INNER JOIN (SELECT ROWID, MAX(timestamp) timestamp FROM {0}) b ON a.ROWID == b.ROWID AND a.timestamp = b.timestamp";
             long result = 0;
             foreach (var type in DatabaseTableTypes)
             {
-                var command = String.Format(format, type.Name);
+                var command = string.Format(format, type.Name);
                 using var cmd = new SQLiteCommand(command, Connection);
                 using var reader = cmd.ExecuteReader();
                 if (!reader.Read()) continue;
                 var newest = reader.GetInt64(0);
                 if (result < newest) result = newest;
             }
+
             return result;
         }
 
@@ -108,16 +121,18 @@ namespace CrossoutLogView.Database.Connection
 
         public void Delete<T>(DateTime start, DateTime end) where T : ILogEntry, new()
         {
-            InvokeNonQuery(String.Format(FormatDelete, nameof(T), start.Ticks, end.Ticks), Connection);
+            InvokeNonQuery(string.Format(FormatDelete, nameof(T), start.Ticks, end.Ticks), Connection);
         }
 
         private string GetDateTimeRangeRequest(Type type, long start, long end)
         {
-            return GetRequestString(type) + String.Format(" WHERE {0} <= {1} AND {1} <= {2}", start, TimeStampFieldName, end);
+            return GetRequestString(type) +
+                   string.Format(" WHERE {0} <= {1} AND {1} <= {2}", start, TimeStampFieldName, end);
         }
+
         private string GetDateTimeRangeRequest(Type type, long start)
         {
-            return GetRequestString(type) + String.Format(" WHERE {0} <= {1} ", start, TimeStampFieldName);
+            return GetRequestString(type) + string.Format(" WHERE {0} <= {1} ", start, TimeStampFieldName);
         }
 
         public override void InitializeConnection()
@@ -127,10 +142,7 @@ namespace CrossoutLogView.Database.Connection
             Connection = new SQLiteConnection("Data Source = " + Strings.DataBaseLogPath);
             Connection.Open();
             CreateDataTable(typeof(LogMetadata), Connection);
-            foreach (var t in ILogEntry.Implementations)
-            {
-                CreateDataTable(t, Connection);
-            }
+            foreach (var t in ILogEntry.Implementations) CreateDataTable(t, Connection);
         }
 
         public override async Task FirstInitialize()

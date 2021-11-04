@@ -1,38 +1,35 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using CrossoutLogView.Database.Data;
+using CrossoutLogView.Database.Events;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.GUI.Models;
-
 using LiveCharts;
 using LiveCharts.Wpf;
-
 using MahApps.Metro.Controls;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using NLog;
 
 namespace CrossoutLogView.GUI.Controls
 {
     /// <summary>
-    /// Interaction logic for PlayerGamesChart.xaml
+    ///     Interaction logic for PlayerGamesChart.xaml
     /// </summary>
     public partial class PlayerGamesChart : ILogging
     {
-        private PlayerGamesChartModel viewModel;
-        public event OpenModelViewerEventHandler OpenViewModel;
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource),
+            typeof(ObservableCollection<PlayerGameModel>), typeof(PlayerGamesChart),
+            new PropertyMetadata(OnItemsSourcePropertyChanged));
+
+        public static readonly DependencyProperty DimensionsProperty = DependencyProperty.Register(nameof(Dimensions),
+            typeof(Dimensions), typeof(PlayerGamesChart),
+            new PropertyMetadata((Dimensions)Settings.Current.Dimensions));
+
+        private readonly PlayerGamesChartModel viewModel;
 
         public PlayerGamesChart()
         {
@@ -44,20 +41,11 @@ namespace CrossoutLogView.GUI.Controls
             Settings.SettingsPropertyChanged += Settings_SettingsPropertyChanged;
         }
 
-        private void Settings_SettingsPropertyChanged(Settings sender, Database.Events.SettingsChangedEventArgs e)
-        {
-            if (sender != null && e != null && e.Name == nameof(Settings.Dimensions) && sender.Dimensions != (int)Dimensions)
-            {
-                Dimensions = (Dimensions)sender.Dimensions;
-            }
-        }
-
         public ObservableCollection<PlayerGameModel> ItemsSource
         {
             get => GetValue(ItemsSourceProperty) as ObservableCollection<PlayerGameModel>;
             set => SetValue(ItemsSourceProperty, value);
         }
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(ObservableCollection<PlayerGameModel>), typeof(PlayerGamesChart), new PropertyMetadata(OnItemsSourcePropertyChanged));
 
         public Dimensions Dimensions
         {
@@ -70,14 +58,19 @@ namespace CrossoutLogView.GUI.Controls
                 SetValue(DimensionsProperty, value);
             }
         }
-        public static readonly DependencyProperty DimensionsProperty = DependencyProperty.Register(nameof(Dimensions), typeof(Dimensions), typeof(PlayerGamesChart), new PropertyMetadata((Dimensions)Settings.Current.Dimensions));
+
+        public event OpenModelViewerEventHandler OpenViewModel;
+
+        private void Settings_SettingsPropertyChanged(Settings sender, SettingsChangedEventArgs e)
+        {
+            if (sender != null && e != null && e.Name == nameof(Settings.Dimensions) &&
+                sender.Dimensions != (int)Dimensions) Dimensions = (Dimensions)sender.Dimensions;
+        }
 
         private static void OnItemsSourcePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             if (obj is PlayerGamesChart cntr && e.NewValue is ObservableCollection<PlayerGameModel> newValue)
-            {
                 cntr.viewModel.Source = newValue;
-            }
         }
 
         private void CartesianChart_DataClick(object sender, ChartPoint chartPoint)
@@ -93,7 +86,11 @@ namespace CrossoutLogView.GUI.Controls
             viewModel.UpdateCollectionsSafe();
         }
 
-        private void RangeSlider_MouseDoubleClick(object sender, MouseButtonEventArgs e) => ResetZoom();
+        private void RangeSlider_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ResetZoom();
+        }
+
         public void ResetZoom()
         {
             RangeSlider_Zoom.LowerValue = RangeSlider_Zoom.Minimum;
@@ -106,8 +103,10 @@ namespace CrossoutLogView.GUI.Controls
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

@@ -1,8 +1,7 @@
-﻿using CrossoutLogView.Database.Data;
+﻿using System;
+using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.Statistics;
-
-using System;
 
 namespace CrossoutLogView.GUI.Models
 {
@@ -12,7 +11,7 @@ namespace CrossoutLogView.GUI.Models
         {
             Parent = null;
             Stripe = new Stripe();
-            Name = String.Empty;
+            Name = string.Empty;
         }
 
         public StripeModel(object parent, Stripe obj)

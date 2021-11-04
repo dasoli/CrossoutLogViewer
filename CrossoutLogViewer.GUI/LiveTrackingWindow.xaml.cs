@@ -1,4 +1,9 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows;
+using CrossoutLogView.Common;
 using CrossoutLogView.Database.Collection;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.Database.Events;
@@ -6,34 +11,22 @@ using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.WindowsAuxilary;
 using CrossoutLogView.Log;
 using CrossoutLogView.Statistics;
-
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
+using NLog;
 
 namespace CrossoutLogView.GUI
 {
     /// <summary>
-    /// Interaction logic for LiveTracking.xaml
+    ///     Interaction logic for LiveTracking.xaml
     /// </summary>
     public partial class LiveTrackingWindow : MetroWindow, ILogging
     {
-        private LoadingWindow loadingWindow;
-
-        private LiveTrackingWindowViewModel viewModel;
         private Game currentGame = new Game();
         private List<ILogEntry> gameLog;
+        private readonly LoadingWindow loadingWindow;
+
+        private LiveTrackingWindowViewModel viewModel;
 
 
         public LiveTrackingWindow()
@@ -55,7 +48,6 @@ namespace CrossoutLogView.GUI
             logger.TraceResource("WinInit");
             InitializeComponent();
             logger.TraceResource("WinInitD");
-
         }
 
         private void InitializedSession()
@@ -81,7 +73,6 @@ namespace CrossoutLogView.GUI
 
         private void OnLogUpload(object sender, LogUploadEventArgs e)
         {
-
         }
 
         private void Window_StateChanged(object sender, EventArgs e)
@@ -91,17 +82,16 @@ namespace CrossoutLogView.GUI
         }
 
         #region Confim close
-        private bool forceClose = false;
+
+        private bool forceClose;
+
         protected override void OnClosing(CancelEventArgs e)
         {
             if (e.Cancel) return;
             if (!forceClose)
             {
                 e.Cancel = true;
-                Dispatcher.BeginInvoke(new Action(async delegate
-                {
-                    await ConfirmClose();
-                }));
+                Dispatcher.BeginInvoke(new Action(async delegate { await ConfirmClose(); }));
             }
             else
             {
@@ -139,13 +129,17 @@ namespace CrossoutLogView.GUI
                     forceClose = true;
                     break;
             }
+
             if (forceClose) Close();
         }
+
         #endregion
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

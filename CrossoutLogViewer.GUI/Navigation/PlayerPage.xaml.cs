@@ -1,23 +1,20 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Database.Connection;
+﻿using System.Windows.Input;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.GUI.WindowsAuxilary;
-
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+using NLog;
 
 namespace CrossoutLogView.GUI.Navigation
 {
     /// <summary>
-    /// Interaction logic for PlayerPage.xaml
+    ///     Interaction logic for PlayerPage.xaml
     /// </summary>
     public partial class PlayerPage : ILogging
     {
         private readonly NavigationWindow nav;
         private readonly PlayerModel playerModel;
+
         public PlayerPage(NavigationWindow nav, PlayerModel playerViewModel)
         {
             this.nav = nav;
@@ -39,8 +36,10 @@ namespace CrossoutLogView.GUI.Navigation
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

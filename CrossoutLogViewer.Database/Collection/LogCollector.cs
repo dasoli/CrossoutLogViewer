@@ -1,7 +1,6 @@
-﻿using CrossoutLogView.Log;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using CrossoutLogView.Log;
 
 namespace CrossoutLogView.Database.Collection
 {
@@ -119,6 +118,7 @@ namespace CrossoutLogView.Database.Collection
                 Current = null;
                 return false;
             }
+
             //update datetimes
             var currentDateTime = new DateTime(Current.TimeStamp);
             if (currentDateTime > Last) Last = currentDateTime;
@@ -127,7 +127,9 @@ namespace CrossoutLogView.Database.Collection
         }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+
+        private bool disposedValue;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -153,10 +155,12 @@ namespace CrossoutLogView.Database.Collection
                 disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(true);
         }
+
         #endregion
     }
 }

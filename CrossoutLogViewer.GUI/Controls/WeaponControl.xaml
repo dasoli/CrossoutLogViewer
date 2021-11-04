@@ -74,16 +74,16 @@
                             <TextBlock Text="{Binding UserName}"
                                        FontWeight="SemiBold" />
                             <TextBlock>
-                            <Run Text="{Binding TotalDamage, StringFormat=0.##, Mode=OneWay}"
-                                 Foreground="{DynamicResource TotalDamage}" />
-                            <Run Text="{Binding CriticalDamage, StringFormat=0.##, Mode=OneWay}"
-                                 Foreground="{DynamicResource CriticalDamage}" />
-                            <Run Text="{Binding ArmorDamage, StringFormat=0.##, Mode=OneWay}"
-                                 Foreground="{DynamicResource ArmorDamage}" />
+                                <Run Text="{Binding TotalDamage, StringFormat=0.##, Mode=OneWay}"
+                                     Foreground="{DynamicResource TotalDamage}" />
+                                <Run Text="{Binding CriticalDamage, StringFormat=0.##, Mode=OneWay}"
+                                     Foreground="{DynamicResource CriticalDamage}" />
+                                <Run Text="{Binding ArmorDamage, StringFormat=0.##, Mode=OneWay}"
+                                     Foreground="{DynamicResource ArmorDamage}" />
                             </TextBlock>
                             <Separator Background="{DynamicResource MahApps.Brushes.Gray.SemiTransparent}"
                                        Margin="4,0"
-                                       HorizontalAlignment="Stretch"/>
+                                       HorizontalAlignment="Stretch" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -129,8 +129,8 @@
                         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[DGWeapon_Name]}"
                                             Binding="{Binding DisplayName}" />
                         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[Weapon_Uses]}"
-                                            Binding="{Binding TotalUses}" 
-                                            SortDirection="Descending"/>
+                                            Binding="{Binding TotalUses}"
+                                            SortDirection="Descending" />
                         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[Damage_Total]}"
                                             Binding="{Binding TotalDamage, StringFormat=0.##}" />
                         <DataGridTextColumn Header="{Binding Source={StaticResource res}, Path=.[Damage_Critical]}"
@@ -156,7 +156,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"
                               MinWidth="300" />
-            <ColumnDefinition  Width="5" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="200"
                               MinWidth="150" />
         </Grid.ColumnDefinitions>

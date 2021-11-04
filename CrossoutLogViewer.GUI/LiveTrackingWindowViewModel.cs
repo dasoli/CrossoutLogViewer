@@ -1,11 +1,6 @@
-﻿using CrossoutLogView.GUI.Core;
+﻿using System.Windows.Threading;
+using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Models;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace CrossoutLogView.GUI
 {
@@ -13,9 +8,11 @@ namespace CrossoutLogView.GUI
     {
         private bool initialized = false;
 
-        public LiveTrackingWindowViewModel() : base() { }
+        public LiveTrackingWindowViewModel()
+        {
+        }
 
-        public LiveTrackingWindowViewModel(Dispatcher dispatcher) : base()
+        public LiveTrackingWindowViewModel(Dispatcher dispatcher)
         {
             WindowDispatcher = dispatcher;
         }
@@ -28,7 +25,6 @@ namespace CrossoutLogView.GUI
 
         protected override void UpdateCollections()
         {
-
         }
     }
 }

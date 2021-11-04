@@ -38,13 +38,12 @@ namespace CrossoutLogView.Common
             if (name == null || other == null) return false;
             return name.Equals(other, StringComparison.InvariantCulture);
         }
+
         public static ReadOnlySpan<char> TrimName(ReadOnlySpan<char> name)
         {
-            for (int i = 0; i < name.Length; i++)
-            {
+            for (var i = 0; i < name.Length; i++)
                 if (name[i] == ':')
                     return name.Slice(0, i);
-            }
             return name;
         }
 

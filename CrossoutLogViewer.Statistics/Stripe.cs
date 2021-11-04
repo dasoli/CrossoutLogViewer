@@ -1,13 +1,12 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Statistics
 {
     public class Stripe : IStatisticData, ICloneable, IMergable<Stripe>
     {
-        public string Name;
         public int Ammount;
+        public string Name;
 
         public Stripe()
         {
@@ -21,14 +20,24 @@ namespace CrossoutLogView.Statistics
             Ammount = ammount;
         }
 
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
         public Stripe Merge(Stripe other)
         {
             return new Stripe(Name, Ammount + other.Ammount);
         }
 
-        public Stripe Clone() => new Stripe(Name, Ammount);
-        object ICloneable.Clone() => Clone();
+        public Stripe Clone()
+        {
+            return new Stripe(Name, Ammount);
+        }
 
-        public override string ToString() => String.Concat(nameof(Stripe), " ", Name, " ", Ammount);
+        public override string ToString()
+        {
+            return string.Concat(nameof(Stripe), " ", Name, " ", Ammount);
+        }
     }
 }

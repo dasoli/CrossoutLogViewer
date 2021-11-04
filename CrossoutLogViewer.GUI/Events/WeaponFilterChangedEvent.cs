@@ -1,10 +1,7 @@
-﻿using CrossoutLogView.GUI.Models;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+using CrossoutLogView.GUI.Models;
 
 namespace CrossoutLogView.GUI.Events
 {
@@ -22,28 +19,41 @@ namespace CrossoutLogView.GUI.Events
         public bool Filter(object obj)
         {
             if (!(obj is WeaponGlobalModel weapon)) return false;
-            if (!String.IsNullOrEmpty(WeaponName))
-            {
+            if (!string.IsNullOrEmpty(WeaponName))
                 foreach (var part in WeaponName.TrimEnd().Split(' ', '-', '_'))
-                {
-                    if (!weapon.DisplayName.Contains(part, StringComparison.InvariantCultureIgnoreCase)) return false;
-                }
-            }
-            if (!String.IsNullOrEmpty(UserName))
-            {
+                    if (!weapon.DisplayName.Contains(part, StringComparison.InvariantCultureIgnoreCase))
+                        return false;
+            if (!string.IsNullOrEmpty(UserName))
                 foreach (var part in UserName.TrimEnd().Split(' ', '-', '_'))
-                {
-                    if (!weapon.WeaponUsers.Any(x => x.UserName.Contains(part, StringComparison.InvariantCultureIgnoreCase))) return false;
-                }
-            }
+                    if (!weapon.WeaponUsers.Any(x =>
+                        x.UserName.Contains(part, StringComparison.InvariantCultureIgnoreCase)))
+                        return false;
             return true;
         }
 
-        public override bool Equals(object obj) => obj is WeaponFilter filter && Equals(filter);
-        public bool Equals([AllowNull] WeaponFilter other) => WeaponName == other.WeaponName && UserName == other.UserName;
-        public override int GetHashCode() => HashCode.Combine(WeaponName, UserName);
+        public override bool Equals(object obj)
+        {
+            return obj is WeaponFilter filter && Equals(filter);
+        }
 
-        public static bool operator ==(WeaponFilter left, WeaponFilter right) => left.Equals(right);
-        public static bool operator !=(WeaponFilter left, WeaponFilter right) => !(left == right);
+        public bool Equals([AllowNull] WeaponFilter other)
+        {
+            return WeaponName == other.WeaponName && UserName == other.UserName;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(WeaponName, UserName);
+        }
+
+        public static bool operator ==(WeaponFilter left, WeaponFilter right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(WeaponFilter left, WeaponFilter right)
+        {
+            return !(left == right);
+        }
     }
 }

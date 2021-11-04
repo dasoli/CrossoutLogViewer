@@ -1,11 +1,14 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class Decal : ILogEntry
     {
+        public int AwardAmmount;
+        public byte PlayerNumber;
+        public string StripeName;
+
         public Decal(long timeStamp, string stripeName, int awardAmmount, byte playerNumber)
         {
             TimeStamp = timeStamp;
@@ -14,12 +17,11 @@ namespace CrossoutLogView.Log
             PlayerNumber = playerNumber;
         }
 
-        public Decal() { }
+        public Decal()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string StripeName;
-        public int AwardAmmount;
-        public byte PlayerNumber;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out Decal deserialized)
         {

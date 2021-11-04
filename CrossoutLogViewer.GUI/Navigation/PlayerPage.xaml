@@ -4,10 +4,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       mc:Ignorable="d"
-      xmlns:models="clr-namespace:CrossoutLogView.GUI.Models"
       xmlns:helpers="clr-namespace:CrossoutLogView.GUI.Helpers"
       xmlns:conv="clr-namespace:CrossoutLogView.GUI.ValueConverters"
-      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
       d:DesignHeight="500"
       d:DesignWidth="600"
       Title="PlayerPage">
@@ -17,7 +15,7 @@
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Won}" Value="True">
                     <Setter Property="Background"
-                            Value="{DynamicResource TeamWon}"/>
+                            Value="{DynamicResource TeamWon}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Won}"
                              Value="False">
@@ -31,7 +29,7 @@
         <conv:TitleConverter x:Key="TitleConverter" />
         <conv:ListItemTextConverter x:Key="ListItemTextConverter" />
     </Page.Resources>
-    
+
     <Grid>
         <WrapPanel Orientation="Horizontal"
                    Style="{DynamicResource WonLostBackground}"
@@ -128,12 +126,14 @@
                 <DataGridTextColumn Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_Name]}"
                                     Width="120"
                                     Binding="{Binding Name}" />
-                <DataGridTextColumn Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_TotalDmg]}"
-                                    Binding="{Binding TotalDamage, StringFormat=0.##}" />
+                <DataGridTextColumn
+                    Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_TotalDmg]}"
+                    Binding="{Binding TotalDamage, StringFormat=0.##}" />
                 <DataGridTextColumn Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_CritDmg]}"
                                     Binding="{Binding CriticalDamage, StringFormat=0.##}" />
-                <DataGridTextColumn Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_ArmorDmg]}"
-                                    Binding="{Binding ArmorDamage, StringFormat=0.##}" />
+                <DataGridTextColumn
+                    Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_ArmorDmg]}"
+                    Binding="{Binding ArmorDamage, StringFormat=0.##}" />
                 <DataGridTextColumn Header="{Binding Source={StaticResource res}, Mode=OneWay, Path=.[Weapon_Uses]}"
                                     Binding="{Binding Uses}" />
             </DataGrid.Columns>
@@ -148,8 +148,8 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Path=., Converter={StaticResource ListItemTextConverter}}"
-                                   Background="Transparent" 
-                                   Margin="4,2"/>
+                                   Background="Transparent"
+                                   Margin="4,2" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

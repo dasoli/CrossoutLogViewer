@@ -1,24 +1,23 @@
-﻿using CrossoutLogView.GUI.Core;
-using CrossoutLogView.GUI.Events;
-using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Windows;
+using CrossoutLogView.GUI.Core;
 
 namespace CrossoutLogView.GUI.Models
 {
     public class UserListModel : ViewModelBase
     {
+        private string _filterUserName;
+
         public UserListModel(ObservableCollection<UserModel> users)
         {
             Users = users ?? throw new ArgumentNullException(nameof(users));
         }
 
-        private string _filterUserName;
-        public string FilterUserName { get => _filterUserName; set => Set(ref _filterUserName, value?.TrimStart()); }
+        public string FilterUserName
+        {
+            get => _filterUserName;
+            set => Set(ref _filterUserName, value?.TrimStart());
+        }
 
         public ObservableCollection<UserModel> Users { get; }
     }

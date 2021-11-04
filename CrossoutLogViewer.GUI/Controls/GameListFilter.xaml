@@ -124,15 +124,17 @@
                             <TextBlock Text="{Binding Source={StaticResource res}, Path=.[Filter_CustomStart]}"
                                        Margin="{StaticResource ContentMargin}"
                                        VerticalAlignment="Center" />
-                            <Controls:DateTimePicker SelectedDateTime="{Binding StartLimit, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                                                     Margin="{StaticResource ContentMargin}"
-                                                     VerticalAlignment="Center" />
+                            <Controls:DateTimePicker
+                                SelectedDateTime="{Binding StartLimit, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                                Margin="{StaticResource ContentMargin}"
+                                VerticalAlignment="Center" />
                             <TextBlock Text="{Binding Source={StaticResource res}, Path=.[Filter_CustomEnd]}"
                                        Margin="{StaticResource ContentMargin}"
                                        VerticalAlignment="Center" />
-                            <Controls:DateTimePicker SelectedDateTime="{Binding EndLimit, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                                                     Margin="{StaticResource ContentMarginRightMost}"
-                                                     VerticalAlignment="Center" />
+                            <Controls:DateTimePicker
+                                SelectedDateTime="{Binding EndLimit, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                                Margin="{StaticResource ContentMarginRightMost}"
+                                VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
                 </Popup>

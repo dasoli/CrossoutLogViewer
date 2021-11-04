@@ -19,7 +19,8 @@ namespace CrossoutLogView.Common
         public static bool IsGenericIEnumerable(Type type)
         {
             var t = typeof(IEnumerable<>);
-            return type != typeof(string) && type.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == t);
+            return type != typeof(string) &&
+                   type.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == t);
         }
 
         public static Type GetEnumerableBaseType(Type type)
@@ -32,8 +33,13 @@ namespace CrossoutLogView.Common
                     ? elementType.GetGenericArguments()[0]
                     : elementType;
             }
-            catch (NotSupportedException) { }
-            catch (InvalidOperationException) { }
+            catch (NotSupportedException)
+            {
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
             return baseType;
         }
     }

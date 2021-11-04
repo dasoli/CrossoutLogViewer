@@ -1,27 +1,27 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CrossoutLogView.Common;
 using CrossoutLogView.Database.Connection;
 using CrossoutLogView.Database.Events;
 using CrossoutLogView.Log;
 using CrossoutLogView.Statistics;
-
-using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
+using NLog;
 
 namespace CrossoutLogView.Database.Collection
 {
     public class StatisticsUploader : IDisposable
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
-        private List<ILogEntry> gameLog = new List<ILogEntry>();
-        private List<Game> games = new List<Game>();
-        private bool yield = false;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public static InvalidateCachedDataEventHandler InvalidateCachedData;
 
-        public StatisticsUploader(long beginTimeStamp, UploaderOperatingMode operatingMode = UploaderOperatingMode.Incremental)
+        private List<ILogEntry> gameLog = new List<ILogEntry>();
+        private List<Game> games = new List<Game>();
+        private bool yield;
+
+        public StatisticsUploader(long beginTimeStamp,
+            UploaderOperatingMode operatingMode = UploaderOperatingMode.Incremental)
         {
             LogEntryTimeStampLowerLimit = beginTimeStamp;
             OperatingMode = operatingMode;
@@ -39,6 +39,7 @@ namespace CrossoutLogView.Database.Collection
             {
                 delta = logCon.RequestAll(LogEntryTimeStampLowerLimit);
             }
+
             if (delta.Count == 0) return;
             delta.Sort(new LogEntryTimeStampAscendingComparer());
             InternalCommit(delta);
@@ -54,12 +55,13 @@ namespace CrossoutLogView.Database.Collection
         {
             if (delta == null) return;
 
-            bool hasFinish = false;
+            var hasFinish = false;
             using (var en = delta.GetEnumerator())
             {
                 while (en.MoveNext())
                 {
-                    if (en.Current.TimeStamp > LogEntryTimeStampLowerLimit) LogEntryTimeStampLowerLimit = en.Current.TimeStamp;
+                    if (en.Current.TimeStamp > LogEntryTimeStampLowerLimit)
+                        LogEntryTimeStampLowerLimit = en.Current.TimeStamp;
                     if (en.Current is LevelLoad ll)
                     {
                         if (yield)
@@ -67,9 +69,11 @@ namespace CrossoutLogView.Database.Collection
                             if (!hasFinish) gameLog.Add(DummyGameFinish(gameLog[gameLog.Count - 1].TimeStamp + 1));
                             FinalizeGameLog();
                         }
+
                         yield = !IgnoreLevel(ll);
                         hasFinish = false;
                     }
+
                     if (yield)
                     {
                         gameLog.Add(en.Current);
@@ -77,6 +81,7 @@ namespace CrossoutLogView.Database.Collection
                     }
                 }
             }
+
             if (games.Count != 0) //games were finished in the added logs
             {
                 var users = User.Parse(games);
@@ -88,32 +93,32 @@ namespace CrossoutLogView.Database.Collection
                         statCon.Insert(games);
                         trans.Commit();
                     }
+
                     using (var trans = statCon.BeginTransaction())
                     {
-                        for (int i = 0; i < users.Count; i++)
-                        {
-                            statCon.UpdateUser(users[i]);
-                        }
+                        for (var i = 0; i < users.Count; i++) statCon.UpdateUser(users[i]);
                         trans.Commit();
                     }
+
                     using (var trans = statCon.BeginTransaction())
                     {
-                        for (int i = 0; i < weapons.Count; i++)
-                        {
-                            statCon.UpdateWeaponGlobal(weapons[i]);
-                        }
+                        for (var i = 0; i < weapons.Count; i++) statCon.UpdateWeaponGlobal(weapons[i]);
                         trans.Commit();
                     }
                 }
+
                 if (OperatingMode == UploaderOperatingMode.Incremental)
                 {
                     var userIDs = users.Select(x => x.UserID);
                     var weaponNames = weapons.Select(x => x.Name);
                     var maps = games.Select(x => x.Map.Name).Distinct();
                     //send event invalidating changed data
-                    logger.Info("Invalidate existing data. {0} different maps played. {1} user changed. {2} weapons changed.", maps.Count(), userIDs.Count(), weapons.Count());
+                    logger.Info(
+                        "Invalidate existing data. {0} different maps played. {1} user changed. {2} weapons changed.",
+                        maps.Count(), userIDs.Count(), weapons.Count());
                     InvalidateCachedData?.Invoke(this, new InvalidateCachedDataEventArgs(userIDs, weaponNames, maps));
                 }
+
                 games.Clear();
             }
         }
@@ -126,6 +131,7 @@ namespace CrossoutLogView.Database.Collection
                 gameLog.Add(DummyGameFinish(LogEntryTimeStampLowerLimit));
                 FinalizeGameLog();
             }
+
             gameLog.Clear();
             yield = false;
         }
@@ -139,7 +145,8 @@ namespace CrossoutLogView.Database.Collection
 
         private GameFinish DummyGameFinish(long dateTime)
         {
-            return new GameFinish(dateTime, "unfinished", 0xff, "unfinished", (new TimeSpan(dateTime - gameLog[0].TimeStamp)).TotalSeconds);
+            return new GameFinish(dateTime, "unfinished", 0xff, "unfinished",
+                new TimeSpan(dateTime - gameLog[0].TimeStamp).TotalSeconds);
         }
 
         private void FinalizeGameLog()
@@ -148,9 +155,15 @@ namespace CrossoutLogView.Database.Collection
             {
                 games.Add(Game.Parse(gameLog));
             }
-            catch (PlayerNotFoundException) { }
-            catch (MatchingLogEntryNotFoundException) { }
-            catch (ArgumentNullException) { }
+            catch (PlayerNotFoundException)
+            {
+            }
+            catch (MatchingLogEntryNotFoundException)
+            {
+            }
+            catch (ArgumentNullException)
+            {
+            }
             finally
             {
                 gameLog.Clear();
@@ -160,13 +173,16 @@ namespace CrossoutLogView.Database.Collection
         private static bool IgnoreLevel(LevelLoad levelLoad)
         {
             return levelLoad == null
-                || String.IsNullOrEmpty(levelLoad.MapPathName)
-                || String.Equals(Strings.LevelLoadNameTestDrive, levelLoad.MapPathName, StringComparison.InvariantCultureIgnoreCase)
-                || String.Equals(Strings.LevelLoadNameMainMenu, levelLoad.MapPathName, StringComparison.InvariantCultureIgnoreCase);
+                   || string.IsNullOrEmpty(levelLoad.MapPathName)
+                   || string.Equals(Strings.LevelLoadNameTestDrive, levelLoad.MapPathName,
+                       StringComparison.InvariantCultureIgnoreCase)
+                   || string.Equals(Strings.LevelLoadNameMainMenu, levelLoad.MapPathName,
+                       StringComparison.InvariantCultureIgnoreCase);
         }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+
+        private bool disposedValue;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -177,18 +193,24 @@ namespace CrossoutLogView.Database.Collection
                     gameLog = null;
                     games = null;
                 }
+
                 disposedValue = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(true);
         }
+
         #endregion
     }
 
     internal class LogEntryTimeStampAscendingComparer : IComparer<ILogEntry>
     {
-        int IComparer<ILogEntry>.Compare(ILogEntry x, ILogEntry y) => x.TimeStamp.CompareTo(y.TimeStamp);
+        int IComparer<ILogEntry>.Compare(ILogEntry x, ILogEntry y)
+        {
+            return x.TimeStamp.CompareTo(y.TimeStamp);
+        }
     }
 }

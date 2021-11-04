@@ -1,37 +1,43 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.Database.Collection;
-using CrossoutLogView.Database.Connection;
-using CrossoutLogView.Database.Data;
-
-using NLog.Config;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using CrossoutLogView.Common;
+using CrossoutLogView.Database.Collection;
+using CrossoutLogView.Database.Connection;
+using CrossoutLogView.Database.Data;
+using NLog;
+using Timer = System.Timers.Timer;
 
 namespace CrossoutLogView.Database
 {
     public class ControlService : ServiceBase
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly FileSystemWatcher fsWatcher;
         private readonly Timer logChangeTrackTimer;
         private readonly StatisticsUploader uploader;
-        private LogConfig current = new LogConfig();
+        private LogConfig current;
 
         public ControlService()
         {
-            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             logger.Trace("Initialize ControlService.");
             Settings.Update();
 
             //enure existence of all databases
-            using (var c = new LogConnection()) { }
-            using (var c = new StatisticsConnection()) { }
+            using (var c = new LogConnection())
+            {
+            }
+
+            using (var c = new StatisticsConnection())
+            {
+            }
 
             CanStop = true;
             CanShutdown = true;
@@ -56,7 +62,10 @@ namespace CrossoutLogView.Database
             logger.Trace("Initialized ControlService.");
         }
 
-        public void Start() => OnStart(null);
+        public void Start()
+        {
+            OnStart(null);
+        }
 
         public void DeleteDatabase()
         {
@@ -67,7 +76,10 @@ namespace CrossoutLogView.Database
                 File.Delete(Strings.DataBaseLogPath);
                 File.Delete(Strings.DataBaseStatisticsPath);
             }
-            catch (IOException) { }
+            catch (IOException)
+            {
+            }
+
             Settings.Current.StatisticsParseDateTime = 0;
             Settings.Current.LogConfiguration = current = default;
             Settings.Current.MyName = Settings.Default.MyName;
@@ -100,6 +112,7 @@ namespace CrossoutLogView.Database
                 ParseLogDelta();
                 uploader.Cleanup();
             }
+
             uploader.Commit();
             Settings.Current.StatisticsParseDateTime = uploader.LogEntryTimeStampLowerLimit;
 
@@ -125,9 +138,7 @@ namespace CrossoutLogView.Database
                     logger.Info("New log found. Path: \"" + updated.Path + "\"");
                     AddLogMetadata(updated);
                     if (!current.Equals(default)) //finish previous log
-                    {
                         ParseLogDelta();
-                    }
                     current = updated;
                     ParseLogDelta();
                     uploader.Cleanup();
@@ -135,7 +146,10 @@ namespace CrossoutLogView.Database
                     Settings.Current.StatisticsParseDateTime = uploader.LogEntryTimeStampLowerLimit;
                 }
             }
-            catch (FileNotFoundException) { }
+            catch (FileNotFoundException)
+            {
+            }
+
             logChangeTrackTimer.Start();
         }
 
@@ -162,6 +176,7 @@ namespace CrossoutLogView.Database
                 current.Position += logs.Parse();
                 logs.Upload();
             }
+
             Settings.Current.LogConfiguration = current;
         }
 
@@ -172,23 +187,30 @@ namespace CrossoutLogView.Database
             if (unprocessedLogs.Count != 0)
             {
                 logger.Info("Upload logs");
-                Parallel.ForEach(unprocessedLogs, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
-                    delegate (string dir)
-                {
-                    try
+                Parallel.ForEach(unprocessedLogs,
+                    new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount * 2 },
+                    delegate(string dir)
                     {
-                        using var logUploader = new LogUploader(dir, UploaderOperatingMode.Unchecked);
-                        using var statUploader = new StatisticsUploader(-1, UploaderOperatingMode.Unchecked);
-                        logUploader.Parse();
-                        logUploader.Upload();
-                        statUploader.Commit(logUploader.Combined);
-                    }
-                    catch (FileNotFoundException) { }
-                });
+                        try
+                        {
+                            using var logUploader = new LogUploader(dir, UploaderOperatingMode.Unchecked);
+                            using var statUploader = new StatisticsUploader(-1, UploaderOperatingMode.Unchecked);
+                            logUploader.Parse();
+                            logUploader.Upload();
+                            statUploader.Commit(logUploader.Combined);
+                        }
+                        catch (FileNotFoundException)
+                        {
+                        }
+                    });
                 using var logCon = new LogConnection();
                 uploader.LogEntryTimeStampLowerLimit = logCon.RequestNewestLogEntryTimeStamp();
             }
-            else logger.Info("Found none.");
+            else
+            {
+                logger.Info("Found none.");
+            }
+
             Settings.WriteInstance();
         }
 
@@ -200,7 +222,7 @@ namespace CrossoutLogView.Database
                 //compare logs in database to logs in directory, missing logs that contain a combat.log are unprocessed logs 
                 var logsInDB = con.RequestMetadata().Select(x => x.Path);
                 var logsInDir = Directory.GetDirectories(Settings.Current.LogRootPath);
-                for (int i = 0; i < logsInDir.Length; i++)
+                for (var i = 0; i < logsInDir.Length; i++)
                 {
                     var dir = Path.Combine(logsInDir[i], Strings.ComatLogName);
                     if (File.Exists(dir) && !logsInDB.Any(x => PathUtility.Equals(x, dir)))
@@ -210,6 +232,7 @@ namespace CrossoutLogView.Database
                     }
                 }
             }
+
             return unprocessedLogs;
         }
 
@@ -221,7 +244,8 @@ namespace CrossoutLogView.Database
         }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+
+        private bool disposedValue;
 
         protected override void Dispose(bool disposing)
         {
@@ -233,10 +257,13 @@ namespace CrossoutLogView.Database
                     if (logChangeTrackTimer != null) logChangeTrackTimer.Dispose();
                     if (uploader != null) uploader.Dispose();
                 }
+
                 disposedValue = true;
             }
+
             base.Dispose(disposing);
         }
+
         #endregion
     }
 }

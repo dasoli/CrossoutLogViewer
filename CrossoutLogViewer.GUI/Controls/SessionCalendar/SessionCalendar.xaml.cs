@@ -1,36 +1,31 @@
-﻿using CrossoutLogView.GUI.Events;
-
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using CrossoutLogView.GUI.Events;
 
 namespace CrossoutLogView.GUI.Controls.SessionCalendar
 {
     /// <summary>
-    /// Interaction logic for SessionCalendar.xaml
+    ///     Interaction logic for SessionCalendar.xaml
     /// </summary>
     public partial class SessionCalendar : UserControl
     {
-        public event DateChangedEventHandler DateChanged;
-        public event SessionClickEventHandler SessionClick;
+        public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date),
+            typeof(DateTime), typeof(SessionCalendar), new PropertyMetadata(DateTime.Now, OnDatePropertyChanged));
 
         public SessionCalendar()
         {
             InitializeComponent();
         }
 
-        public DateTime Date { get => (DateTime)GetValue(DateProperty); set => SetValue(DateProperty, value); }
-        public static readonly DependencyProperty DateProperty = DependencyProperty.Register(nameof(Date), typeof(DateTime), typeof(SessionCalendar), new PropertyMetadata(DateTime.Now, OnDatePropertyChanged));
+        public DateTime Date
+        {
+            get => (DateTime)GetValue(DateProperty);
+            set => SetValue(DateProperty, value);
+        }
+
+        public event DateChangedEventHandler DateChanged;
+        public event SessionClickEventHandler SessionClick;
 
         private static void OnDatePropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {

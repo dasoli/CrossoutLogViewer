@@ -1,37 +1,32 @@
-﻿using CrossoutLogView.Common;
-using CrossoutLogView.GUI.Events;
-using CrossoutLogView.GUI.Models;
-
-using MahApps.Metro.Controls;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using CrossoutLogView.Common;
+using CrossoutLogView.GUI.Events;
+using CrossoutLogView.GUI.Models;
 
 namespace CrossoutLogView.GUI.Controls.SessionCalendar
 {
     /// <summary>
-    /// Interaction logic for SessionMonth.xaml
+    ///     Interaction logic for SessionMonth.xaml
     /// </summary>
     public partial class SessionMonth : UserControl
     {
-        private SessionMonthModel viewModel;
-        private BackgroundWorker generateControlsWorker = new BackgroundWorker();
-        private bool lockGeneration;
+        public static readonly DependencyProperty StartOfMonthProperty =
+            DependencyProperty.Register(nameof(StartOfMonth), typeof(DateTime), typeof(SessionMonth),
+                new PropertyMetadata(default(DateTime), OnStartOfMonthPropertyChanged));
 
-        public event SessionClickEventHandler SessionClick;
+        public static readonly DependencyProperty EndOfMonthProperty = DependencyProperty.Register(nameof(EndOfMonth),
+            typeof(DateTime), typeof(SessionMonth),
+            new PropertyMetadata(default(DateTime), OnEndOfMonthPropertyChanged));
+
+        private readonly BackgroundWorker generateControlsWorker = new BackgroundWorker();
+        private bool lockGeneration;
+        private readonly SessionMonthModel viewModel;
 
         public SessionMonth()
         {
@@ -39,26 +34,29 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
             InitializeWorkers();
             DataContext = viewModel = new SessionMonthModel();
         }
-        public DateTime StartOfMonth { get => (DateTime)GetValue(StartOfMonthProperty); set => SetValue(StartOfMonthProperty, value); }
-        public static readonly DependencyProperty StartOfMonthProperty = DependencyProperty.Register(nameof(StartOfMonth), typeof(DateTime), typeof(SessionMonth), new PropertyMetadata(default(DateTime), OnStartOfMonthPropertyChanged));
 
-        public DateTime EndOfMonth { get => (DateTime)GetValue(EndOfMonthProperty); set => SetValue(EndOfMonthProperty, value); }
-        public static readonly DependencyProperty EndOfMonthProperty = DependencyProperty.Register(nameof(EndOfMonth), typeof(DateTime), typeof(SessionMonth), new PropertyMetadata(default(DateTime), OnEndOfMonthPropertyChanged));
+        public DateTime StartOfMonth
+        {
+            get => (DateTime)GetValue(StartOfMonthProperty);
+            set => SetValue(StartOfMonthProperty, value);
+        }
+
+        public DateTime EndOfMonth
+        {
+            get => (DateTime)GetValue(EndOfMonthProperty);
+            set => SetValue(EndOfMonthProperty, value);
+        }
+
+        public event SessionClickEventHandler SessionClick;
 
         private static void OnStartOfMonthPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (obj is SessionMonth cntr && e.NewValue is DateTime)
-            {
-                cntr.GenerateControls();
-            }
+            if (obj is SessionMonth cntr && e.NewValue is DateTime) cntr.GenerateControls();
         }
 
         private static void OnEndOfMonthPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            if (obj is SessionMonth cntr && e.NewValue is DateTime)
-            {
-                cntr.GenerateControls();
-            }
+            if (obj is SessionMonth cntr && e.NewValue is DateTime) cntr.GenerateControls();
         }
 
         public void LoadMonth(DateTime date)
@@ -72,14 +70,16 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
 
         private void InitializeWorkers()
         {
-            generateControlsWorker.DoWork += async delegate (object sender, DoWorkEventArgs e)
+            generateControlsWorker.DoWork += async delegate(object sender, DoWorkEventArgs e)
             {
-                (DateTime start, DateTime end) = (ValueTuple<DateTime, DateTime>)e.Argument;
+                (var start, var end) = (ValueTuple<DateTime, DateTime>)e.Argument;
                 var monthSpan = end - start;
                 var month = start.Month;
                 // Month cannot be longer then a 31 days
                 if (monthSpan.Days > 31)
-                    throw new InvalidOperationException(String.Format(CultureInfo.InvariantCulture, "The difference between the values of StartOfMonth and EndOfMonth cannot be greater then 31d23h59m59s.999. StartOfMonth: {0}, EndOfMonth {1}.", start, end));
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture,
+                        "The difference between the values of StartOfMonth and EndOfMonth cannot be greater then 31d23h59m59s.999. StartOfMonth: {0}, EndOfMonth {1}.",
+                        start, end));
                 // Calculate the days of the first week in the month
                 DateTime startOfWeek = start.Date, endOfWeek = GetEndOfWeekInMonth(startOfWeek, month);
                 var weeks = new List<DateWeek>(5);
@@ -90,8 +90,7 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
                     // Caclcualte the days of the next week in the month
                     startOfWeek = endOfWeek.AddMilliseconds(1);
                     endOfWeek = GetEndOfWeekInMonth(startOfWeek, month);
-                }
-                while (startOfWeek.Month == month);
+                } while (startOfWeek.Month == month);
 
                 await Dispatcher.InvokeAsync(delegate
                 {
@@ -104,9 +103,7 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
         private void GenerateControls()
         {
             if (!lockGeneration && StartOfMonth != default && EndOfMonth != default)
-            {
                 generateControlsWorker.RunWorkerAsync((StartOfMonth, EndOfMonth));
-            }
         }
 
         private static DateTime GetEndOfWeekInMonth(DateTime dayInWeek, int month)
@@ -115,10 +112,8 @@ namespace CrossoutLogView.GUI.Controls.SessionCalendar
             var endOfWeek = dayInWeek.EndOfWeek();
             // While the month is different
             while (endOfWeek.Month != month && endOfWeek > dayInWeek)
-            {
                 // Remove one day
                 endOfWeek = endOfWeek.AddDays(-1);
-            }
             return endOfWeek;
         }
 

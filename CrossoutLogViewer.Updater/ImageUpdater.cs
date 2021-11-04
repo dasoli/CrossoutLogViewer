@@ -1,14 +1,12 @@
-﻿using CrossoutLogView.Common;
-
-using Octokit;
-
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
+using CrossoutLogView.Common;
+using Octokit;
+using FileMode = System.IO.FileMode;
 
 namespace CrossoutLogView.Updater
 {
@@ -23,21 +21,25 @@ namespace CrossoutLogView.Updater
         }
 
         /// <summary>
-        /// Syncronizes local image files with the images present obtained from GitHub.
+        ///     Syncronizes local image files with the images present obtained from GitHub.
         /// </summary>
         public override async Task Update()
         {
             // Obtain remote metadata file
-            var remote = GetRemoteMetadata(Path.Combine(Strings.RemoteImagePath, Strings.MetadataFile)); // Remote path: resources\images\metadata.json
+            var remote =
+                GetRemoteMetadata(Path.Combine(Strings.RemoteImagePath,
+                    Strings.MetadataFile)); // Remote path: resources\images\metadata.json
             // Generate local file metadata
             var local = FileMetadata.FromPaths(HashFunction, Directory.GetFiles(Strings.ImagePath));
             // All files that need updating
             var metadata = ComputeMetadataDelta(local, await remote);
             // Iterate through images in metadata
-            await foreach(var (Name, Value) in GetDirectoryContent(Strings.RemoteImagePath, ImageConverter, x => UpdateSelector(metadata, x)))
+            await foreach (var (Name, Value) in GetDirectoryContent(Strings.RemoteImagePath, ImageConverter,
+                x => UpdateSelector(metadata, x)))
             {
                 // Write file to the images folder
-                using var fs = new FileStream(Path.Combine(Strings.ImagePath, Name), System.IO.FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+                using var fs = new FileStream(Path.Combine(Strings.ImagePath, Name), FileMode.Create, FileAccess.Write,
+                    FileShare.ReadWrite);
                 Value.Save(fs, ImageFormat.Jpeg);
             }
         }
@@ -50,8 +52,10 @@ namespace CrossoutLogView.Updater
             return new Bitmap(fs);
         }
 
-        #region IDisposable members 
+        #region IDisposable members
+
         private bool disposedValue;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -59,6 +63,7 @@ namespace CrossoutLogView.Updater
                 if (disposing)
                 {
                 }
+
                 Client = null;
                 disposedValue = true;
             }
@@ -66,8 +71,9 @@ namespace CrossoutLogView.Updater
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            Dispose(true);
         }
+
         #endregion
     }
 }

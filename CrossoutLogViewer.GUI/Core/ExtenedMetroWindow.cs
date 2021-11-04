@@ -1,32 +1,27 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Windows;
+using CrossoutLogView.Common;
 using CrossoutLogView.GUI.Events;
 using CrossoutLogView.GUI.Services;
 using CrossoutLogView.GUI.WindowsAuxilary;
-
 using MahApps.Metro.Controls;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
 
 namespace CrossoutLogView.GUI.Core
 {
     public class ExtenedMetroWindow<TViewModel> : MetroWindow where TViewModel : WindowViewModelBase, new()
     {
-        private LoadingWindow loadingWindow = new LoadingWindow();
-        protected TViewModel ViewModel { get; private set; }
+        private readonly LoadingWindow loadingWindow = new LoadingWindow();
 
         /// <summary>
-        /// Initializes a new Instance of ExtenedMetroWindow.
-        /// Begins the startup behaviour:
-        /// 1. [MTA] Call App.InitializeSession
-        /// Once done:
-        /// 2.  [MTA] Initialize ViewModel
-        /// 3.  [MTA] Assign dispatcher to ViewModel
-        /// 4.  [SYNC] Call OnInitializeSession
-        /// Once done:
-        /// 5.  [SYNC] Call OnInitializedViewModel
+        ///     Initializes a new Instance of ExtenedMetroWindow.
+        ///     Begins the startup behaviour:
+        ///     1. [MTA] Call App.InitializeSession
+        ///     Once done:
+        ///     2.  [MTA] Initialize ViewModel
+        ///     3.  [MTA] Assign dispatcher to ViewModel
+        ///     4.  [SYNC] Call OnInitializeSession
+        ///     Once done:
+        ///     5.  [SYNC] Call OnInitializedViewModel
         /// </summary>
         public ExtenedMetroWindow()
         {
@@ -40,6 +35,8 @@ namespace CrossoutLogView.GUI.Core
 
             loadingWindow.Show();
         }
+
+        protected TViewModel ViewModel { get; private set; }
 
         private void StartUpInitializeSession()
         {
@@ -61,10 +58,15 @@ namespace CrossoutLogView.GUI.Core
         protected virtual void LocaleChanged(object sender, ValueChangedEventArgs<Locale> e)
         {
             if (!(e is null || e.NewValue is null))
-                FlowDirection = e.NewValue.RTL ? System.Windows.FlowDirection.RightToLeft : System.Windows.FlowDirection.LeftToRight;
+                FlowDirection = e.NewValue.RTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
         }
 
-        protected virtual void OnInitializeSession() { }
-        protected virtual void OnInitializedViewModel() { }
+        protected virtual void OnInitializeSession()
+        {
+        }
+
+        protected virtual void OnInitializedViewModel()
+        {
+        }
     }
 }

@@ -1,12 +1,18 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class Damage : ILogEntry
     {
-        public Damage(long timeStamp, string victim, string attacker, string weapon, double damageAmmount, DamageFlag damageFlags)
+        public string Attacker;
+        public double DamageAmmount;
+        public DamageFlag DamageFlags;
+        public string Victim;
+        public string Weapon;
+
+        public Damage(long timeStamp, string victim, string attacker, string weapon, double damageAmmount,
+            DamageFlag damageFlags)
         {
             TimeStamp = timeStamp;
             Victim = victim;
@@ -16,14 +22,11 @@ namespace CrossoutLogView.Log
             DamageFlags = damageFlags;
         }
 
-        public Damage() { }
+        public Damage()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string Victim;
-        public string Attacker;
-        public string Weapon;
-        public double DamageAmmount;
-        public DamageFlag DamageFlags;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out Damage deserialized)
         {
@@ -32,16 +35,16 @@ namespace CrossoutLogView.Log
             var parser = new Tokenizer();
             if (!parser.First(logLine, "Damage. Victim: ")) return false;
             if (!parser.MoveNext(logLine, ", attacker: ")) return false;
-            string victim = parser.CurrentString;
+            var victim = parser.CurrentString;
             if (!parser.MoveNext(logLine, ", weapon '")) return false;
-            string attacker = parser.CurrentString;
+            var attacker = parser.CurrentString;
             if (!parser.MoveNext(logLine, "', damage: ")) return false;
-            string weapon = parser.CurrentString;
+            var weapon = parser.CurrentString;
             if (!parser.MoveNext(logLine, " ")) return false;
-            double damage = parser.CurrentSingle;
+            var damage = parser.CurrentSingle;
             parser.End(logLine);
             var damageFlags = DamageFlagsUtility.FromString(parser.CurrentString);
-            long timeStamp = TimeConverter.FromString(logLine, logDate);
+            var timeStamp = TimeConverter.FromString(logLine, logDate);
             deserialized = new Damage(timeStamp, victim, attacker, weapon, damage, damageFlags);
             return true;
         }

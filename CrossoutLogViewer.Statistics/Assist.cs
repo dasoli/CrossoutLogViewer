@@ -1,20 +1,18 @@
 ﻿using CrossoutLogView.Log;
 
-using System;
-
 namespace CrossoutLogView.Statistics
 {
     public class Assist : IStatisticData
     {
         public string Assistant;
-        public Weapon Weapon;
+        public DamageFlag DamageFlags;
         public double Elapsed;
         public double TotalDamage;
-        public DamageFlag DamageFlags;
+        public Weapon Weapon;
 
         public Assist()
         {
-            Assistant = String.Empty;
+            Assistant = string.Empty;
             Weapon = default;
             Elapsed = TotalDamage = 0.0;
             DamageFlags = DamageFlag.None;
@@ -31,6 +29,9 @@ namespace CrossoutLogView.Statistics
 
         public bool IsCriticalDamage => (DamageFlags & DamageFlag.HUD_IMPORTANT) == DamageFlag.HUD_IMPORTANT;
 
-        public override string ToString() => String.Concat(nameof(Assist), " ", Assistant, " ", TotalDamage, " ", DamageFlags);
+        public override string ToString()
+        {
+            return string.Concat(nameof(Assist), " ", Assistant, " ", TotalDamage, " ", DamageFlags);
+        }
     }
 }

@@ -1,11 +1,10 @@
-﻿using CrossoutLogView.Common;
-
-using Octokit;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using CrossoutLogView.Common;
+using Octokit;
+using FileMode = System.IO.FileMode;
 
 namespace CrossoutLogView.Updater
 {
@@ -20,7 +19,7 @@ namespace CrossoutLogView.Updater
         }
 
         /// <summary>
-        /// Syncronizes local config files with the files present obtained from GitHub.
+        ///     Syncronizes local config files with the files present obtained from GitHub.
         /// </summary>
         public override async Task Update()
         {
@@ -31,10 +30,12 @@ namespace CrossoutLogView.Updater
             // All files that need updating
             var metadata = ComputeMetadataDelta(local, await remote);
             // Iterate though files in metadata
-            await foreach (var (Name, Value) in GetDirectoryContent(Strings.RemotePatchPath, ConfigConverter, x => UpdateSelector(metadata, x)))
+            await foreach (var (Name, Value) in GetDirectoryContent(Strings.RemotePatchPath, ConfigConverter,
+                x => UpdateSelector(metadata, x)))
             {
                 // Write file to the config folder
-                using var fs = new FileStream(Path.Combine(Strings.PatchPath, Name), System.IO.FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+                using var fs = new FileStream(Path.Combine(Strings.PatchPath, Name), FileMode.Create, FileAccess.Write,
+                    FileShare.ReadWrite);
                 using var sw = new StreamWriter(fs);
                 await sw.WriteLineAsync(Value);
             }
@@ -43,22 +44,24 @@ namespace CrossoutLogView.Updater
         private string ConfigConverter(RepositoryContent content)
         {
             if (content is null)
-                return String.Empty;
+                return string.Empty;
             using var fs = WebClient.OpenRead(new Uri(content.DownloadUrl));
             using var sr = new StreamReader(fs);
             return sr.ReadToEnd();
         }
 
-        #region IDisposable members 
+        #region IDisposable members
+
         private bool disposedValue;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-
                 }
+
                 Client = null;
                 disposedValue = true;
             }
@@ -66,8 +69,9 @@ namespace CrossoutLogView.Updater
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            Dispose(true);
         }
+
         #endregion
     }
 }

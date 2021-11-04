@@ -1,8 +1,5 @@
-﻿using CrossoutLogView.Database.Data;
-
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using CrossoutLogView.Database.Data;
 
 namespace CrossoutLogView.Database.Events
 {

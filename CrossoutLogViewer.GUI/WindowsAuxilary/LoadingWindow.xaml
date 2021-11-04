@@ -3,10 +3,7 @@
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                      xmlns:UserControls="clr-namespace:CrossoutLogView.GUI.Controls"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:IconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-                      xmlns:local="clr-namespace:CrossoutLogView.GUI.WindowsAuxilary"
                       mc:Ignorable="d"
                       Style="{DynamicResource MetroWindowTitlebarColorStyle}"
                       ResizeMode="NoResize"
@@ -47,11 +44,11 @@
     <Grid>
         <TextBlock Text="{Binding ElementName=_LoadingWindow, Path=Header}"
                    Style="{DynamicResource Header}"
-                   Margin="4,0,4,4"/>
+                   Margin="4,0,4,4" />
         <TextBlock Text="{Binding ElementName=_LoadingWindow, Path=Message}"
                    Style="{DynamicResource Content}"
-                   Grid.Row="1" 
-                   Margin="4,4,0,4"/>
+                   Grid.Row="1"
+                   Margin="4,4,0,4" />
         <Controls:MetroProgressBar x:Name="ProgressBar"
                                    IsIndeterminate="{Binding ElementName=_LoadingWindow, Path=IsIndeterminate, Mode=TwoWay}"
                                    Maximum="{Binding ElementName=_LoadingWindow, Path=Maximum, Mode=TwoWay}"

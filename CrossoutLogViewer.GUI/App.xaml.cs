@@ -1,40 +1,32 @@
-﻿using ControlzEx.Theming;
-
+﻿using System;
+using System.IO;
+using System.Runtime.ExceptionServices;
+using System.Windows;
+using ControlzEx.Theming;
 using CrossoutLogView.Common;
 using CrossoutLogView.Database;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
+using CrossoutLogView.GUI.LocalResources;
 using CrossoutLogView.GUI.Services;
 using CrossoutLogView.GUI.WindowsAuxilary;
-
 using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-
-using Microsoft.Extensions.Configuration;
-
-using NLog.Targets;
-
-using System;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows;
+using NLog;
+using NLog.Config;
 
 namespace CrossoutLogView.GUI
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : ILogging
     {
-        private static Theme _theme = ThemeManager.Current.DetectTheme();
-
-        private static bool isInitialized = false;
-
         internal const byte DarkThemeColorAlpha = 0x38;
 
         internal const byte LightThemeColorAlpha = 0x7A;
+        private static Theme _theme = ThemeManager.Current.DetectTheme();
+
+        private static bool isInitialized;
 
         internal static ControlService SessionControlService;
 
@@ -44,7 +36,7 @@ namespace CrossoutLogView.GUI
             set
             {
                 _theme = value;
-                ThemeManager.Current.ChangeTheme(App.Current, _theme);
+                ThemeManager.Current.ChangeTheme(Current, _theme);
                 Settings.Current.ColorScheme = _theme.ColorScheme;
                 Settings.Current.BaseColorScheme = Theme.BaseColorScheme;
             }
@@ -64,6 +56,7 @@ namespace CrossoutLogView.GUI
                 SessionControlService.Start();
                 logger.TraceResource("AppInitD");
             }
+
             isInitialized = true;
         }
 
@@ -92,20 +85,17 @@ namespace CrossoutLogView.GUI
             // Ensure write permission to containing folder
             if (!FolderPermissionHelper.CanRWXByDummy())
             {
-
             }
 
             var path = Strings.ConfigPath + @"\NLog.config";
             if (File.Exists(path))
-            {
                 // Load logger setting
-                NLog.LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(path);
-            }
+                LogManager.Configuration = new XmlLoggingConfiguration(path);
             // Register Resources with ResourceManagerService
-            ResourceManagerService.RegisterManager("LogResources", LocalResources.LogResources.ResourceManager);
-            ResourceManagerService.RegisterManager("WindowResources", LocalResources.WindowResources.ResourceManager);
-            ResourceManagerService.RegisterManager("ControlResources", LocalResources.ControlResources.ResourceManager);
-            ResourceManagerService.RegisterManager("SharedResources", LocalResources.SharedResources.ResourceManager);
+            ResourceManagerService.RegisterManager("LogResources", LogResources.ResourceManager);
+            ResourceManagerService.RegisterManager("WindowResources", WindowResources.ResourceManager);
+            ResourceManagerService.RegisterManager("ControlResources", ControlResources.ResourceManager);
+            ResourceManagerService.RegisterManager("SharedResources", SharedResources.ResourceManager);
             ResourceManagerService.Refresh();
             // Subscribe logger to all exceptions
             AppDomain.CurrentDomain.FirstChanceException += OnAppDomain_Exception;
@@ -115,8 +105,8 @@ namespace CrossoutLogView.GUI
             ResourceManagerService.ChangeLocale(Settings.Current.Locale);
 
             MetroWindow launchWindow = null;
-            bool startMinimized = false;
-            for (int i = 0; i < e.Args.Length; i++)
+            var startMinimized = false;
+            for (var i = 0; i < e.Args.Length; i++)
             {
                 var arg = e.Args[i].TrimStart('/', '\\', '-');
                 if (arg.Length == e.Args[i].Length) continue; // No prefix -> invalid command line arg
@@ -133,8 +123,6 @@ namespace CrossoutLogView.GUI
                     case "StartMinimized":
                         startMinimized = true;
                         break;
-                    default:
-                        break;
                 }
             }
 
@@ -144,17 +132,20 @@ namespace CrossoutLogView.GUI
             launchWindow.Show();
         }
 
-        private static void OnAppDomain_Exception(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        private static void OnAppDomain_Exception(object sender, FirstChanceExceptionEventArgs e)
         {
-            if (sender != null && typeof(ILogging).IsAssignableFrom(sender.GetType())) // Attempt to use the Logger of the cause
+            if (sender != null &&
+                typeof(ILogging).IsAssignableFrom(sender.GetType())) // Attempt to use the Logger of the cause
                 (sender as ILogging).Logger.Error(e.Exception);
             else // Fallback to the App logger
                 logger.Error(e.Exception);
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; }
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; }
+
         #endregion
     }
 }

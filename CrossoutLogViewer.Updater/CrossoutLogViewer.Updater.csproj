@@ -1,33 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>CrossoutLogView.Updater</RootNamespace>
-    <StartupObject>CrossoutLogView.Updater.Program</StartupObject>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RootNamespace>CrossoutLogView.Updater</RootNamespace>
+        <StartupObject>CrossoutLogView.Updater.Program</StartupObject>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <AssemblyVersion>0.1.4.0</AssemblyVersion>
-    <Version>0.1.4.0</Version>
-  </PropertyGroup>
+    <PropertyGroup>
+        <AssemblyVersion>0.1.4.0</AssemblyVersion>
+        <Version>0.1.4.0</Version>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Octokit" Version="0.48.0" />
-    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.3"/>
+        <PackageReference Include="Octokit" Version="0.48.0"/>
+        <PackageReference Include="System.Drawing.Common" Version="4.7.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CrossoutLogViewer.Common\CrossoutLogViewer.Common.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\CrossoutLogViewer.Common\CrossoutLogViewer.Common.csproj"/>
+    </ItemGroup>
 
 </Project>

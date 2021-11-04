@@ -1,21 +1,18 @@
-﻿using CrossoutLogView.Log;
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
+using CrossoutLogView.Log;
 using static CrossoutLogView.Common.Strings;
 
 namespace CrossoutLogView.Statistics
 {
     public class Player : PlayerBase, IStatisticData
     {
-        public int PlayerIndex;
-        public int PartyID;
         public bool IsBot;
+        public int PartyID;
+        public int PlayerIndex;
         public byte Team;
 
-        public Player() : base()
+        public Player()
         {
             PlayerIndex = -1;
             PartyID = -1;
@@ -23,7 +20,7 @@ namespace CrossoutLogView.Statistics
             Team = 0xff;
         }
 
-        public Player(PlayerLoad player) : base()
+        public Player(PlayerLoad player)
         {
             Name = player.PlayerNickName;
             PlayerIndex = player.PlayerNumber;
@@ -37,13 +34,9 @@ namespace CrossoutLogView.Statistics
         {
             var players = new List<Player>();
             Killing currentKill = null;
-            foreach (var pll in gameLog.Where(x => x is PlayerLoad).Cast<PlayerLoad>())
-            {
-                players.Add(new Player(pll));
-            }
+            foreach (var pll in gameLog.Where(x => x is PlayerLoad).Cast<PlayerLoad>()) players.Add(new Player(pll));
             if (players.Count == 0) throw new PlayerNotFoundException("Log contains no players", nameof(gameLog));
             foreach (var logEntry in gameLog)
-            {
                 if (logEntry is Damage dmg)
                 {
                     var attacker = players.Find(x => NameEquals(dmg.Attacker, x.Name));
@@ -60,17 +53,22 @@ namespace CrossoutLogView.Statistics
                         criticalDamage = 0.0;
                         armorDamage = dmg.DamageAmmount;
                     }
+
                     attacker.ArmorDamageDealt += armorDamage;
                     attacker.CriticalDamageDealt += criticalDamage;
 
                     var weaponName = TrimName(dmg.Weapon).ToString();
                     var weapon = attacker.Weapons.Find(x => NameEquals(weaponName, x.Name));
-                    if (weapon == null) attacker.Weapons.Add(new Weapon(weaponName, criticalDamage, armorDamage));
+                    if (weapon == null)
+                    {
+                        attacker.Weapons.Add(new Weapon(weaponName, criticalDamage, armorDamage));
+                    }
                     else
                     {
                         weapon.ArmorDamage += armorDamage;
                         weapon.CriticalDamage += criticalDamage;
                     }
+
                     victim.ArmorDamageTaken += armorDamage;
                     victim.CriticalDamageTaken += criticalDamage;
                 }
@@ -103,22 +101,24 @@ namespace CrossoutLogView.Statistics
                     if (stripe != null) stripe.Ammount++;
                     else if (player != null) player.Stripes.Add(new Stripe(decal.StripeName, decal.AwardAmmount));
                 }
-            }
+
             //merge players from different rounds
             var playersDistinct = new List<Player>();
-            foreach (IGrouping<int, Player> group in players.GroupBy(x => x.UserID))
+            foreach (var group in players.GroupBy(x => x.UserID))
             {
                 Player distinct = null;
                 foreach (var player in group)
-                {
                     if (distinct == null) distinct = player;
-                    else PlayerBase.Merge(distinct, player);
-                }
+                    else Merge(distinct, player);
                 playersDistinct.Add(distinct);
             }
+
             return playersDistinct;
         }
 
-        public override string ToString() => String.Concat(nameof(User), " ", Name, " ", UserID, " ", Team);
+        public override string ToString()
+        {
+            return string.Concat(nameof(User), " ", Name, " ", UserID, " ", Team);
+        }
     }
 }

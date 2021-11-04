@@ -7,7 +7,7 @@ namespace CrossoutLogView.Common
     public static class ExplorerOpenFile
     {
         /// <summary>
-        /// Opens a file from a <see cref="Uri"/> using the windows explorer.
+        ///     Opens a file from a <see cref="Uri" /> using the windows explorer.
         /// </summary>
         /// <param name="fileUri">The uri to open.</param>
         /// <returns>True if the proccess was spawned successfully, otherwise false.</returns>
@@ -17,7 +17,7 @@ namespace CrossoutLogView.Common
         }
 
         /// <summary>
-        /// Opens a file path in the windows explorer.
+        ///     Opens a file path in the windows explorer.
         /// </summary>
         /// <param name="filePath">The file path to open.</param>
         /// <returns>True if the proccess was spawned successfully, otherwise false.</returns>
@@ -35,6 +35,7 @@ namespace CrossoutLogView.Common
             {
                 return false;
             }
+
             return true;
         }
     }

@@ -1,11 +1,12 @@
-﻿using CrossoutLogView.Common;
-
-using System;
+﻿using System;
+using CrossoutLogView.Common;
 
 namespace CrossoutLogView.Log
 {
     public class Killing : ILogEntry
     {
+        public string Killer;
+        public string Victim;
 
         public Killing(long timeStamp, string victim, string killer)
         {
@@ -14,11 +15,11 @@ namespace CrossoutLogView.Log
             Killer = killer;
         }
 
-        public Killing() { }
+        public Killing()
+        {
+        }
 
         public long TimeStamp { get; set; }
-        public string Victim;
-        public string Killer;
 
         public static bool TryParse(in ReadOnlySpan<char> logLine, in DateTime logDate, out Killing deserialized)
         {

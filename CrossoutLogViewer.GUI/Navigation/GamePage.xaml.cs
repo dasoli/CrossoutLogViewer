@@ -1,26 +1,26 @@
-﻿using CrossoutLogView.Common;
+﻿using System;
+using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Input;
+using CrossoutLogView.Common;
 using CrossoutLogView.Database.Data;
 using CrossoutLogView.GUI.Core;
 using CrossoutLogView.GUI.Helpers;
 using CrossoutLogView.GUI.Models;
 using CrossoutLogView.GUI.WindowsAuxilary;
-
-using System;
-using System.Linq;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
+using NLog;
 
 namespace CrossoutLogView.GUI.Navigation
 {
     /// <summary>
-    /// Interaction logic for GamePage.xaml
+    ///     Interaction logic for GamePage.xaml
     /// </summary>
     public partial class GamePage : ILogging
     {
-        private bool isRoundKillerOver = false, isRoundVictimOver = false, isRoundAssistantOver = false;
-        private readonly NavigationWindow nav;
         private readonly GameModel gameModel;
+        private readonly NavigationWindow nav;
+        private bool isRoundKillerOver, isRoundVictimOver, isRoundAssistantOver;
+
         public GamePage(NavigationWindow nav, GameModel gameViewModel)
         {
             if (gameViewModel is null)
@@ -37,12 +37,35 @@ namespace CrossoutLogView.GUI.Navigation
             MapImage.Source = ImageHelper.GetMapImage(gameModel.Map.Name);
         }
 
-        private void RoundKillEnter(object sender, MouseEventArgs e) => isRoundKillerOver = true;
-        private void RoundKillLeave(object sender, MouseEventArgs e) => isRoundKillerOver = false;
-        private void RoundVictimEnter(object sender, MouseEventArgs e) => isRoundVictimOver = true;
-        private void RoundVictimLeave(object sender, MouseEventArgs e) => isRoundVictimOver = false;
-        private void RoundAssistantEnter(object sender, MouseEventArgs e) => isRoundAssistantOver = true;
-        private void RoundAssistantLeave(object sender, MouseEventArgs e) => isRoundAssistantOver = false;
+        private void RoundKillEnter(object sender, MouseEventArgs e)
+        {
+            isRoundKillerOver = true;
+        }
+
+        private void RoundKillLeave(object sender, MouseEventArgs e)
+        {
+            isRoundKillerOver = false;
+        }
+
+        private void RoundVictimEnter(object sender, MouseEventArgs e)
+        {
+            isRoundVictimOver = true;
+        }
+
+        private void RoundVictimLeave(object sender, MouseEventArgs e)
+        {
+            isRoundVictimOver = false;
+        }
+
+        private void RoundAssistantEnter(object sender, MouseEventArgs e)
+        {
+            isRoundAssistantOver = true;
+        }
+
+        private void RoundAssistantLeave(object sender, MouseEventArgs e)
+        {
+            isRoundAssistantOver = false;
+        }
 
         private void ScoreOpenPlayer(object sender, MouseButtonEventArgs e)
         {
@@ -68,10 +91,8 @@ namespace CrossoutLogView.GUI.Navigation
                 if (isRoundAssistantOver) targetPlayer = PlayerByName(av.Assistant);
                 e.Handled = true;
             }
-            if (targetPlayer != null)
-            {
-                nav.Navigate(new PlayerPage(nav, targetPlayer));
-            }
+
+            if (targetPlayer != null) nav.Navigate(new PlayerPage(nav, targetPlayer));
         }
 
         private void OpenMVP(object sender, MouseButtonEventArgs e)
@@ -94,13 +115,15 @@ namespace CrossoutLogView.GUI.Navigation
 
         private PlayerModel PlayerByName(string name)
         {
-            if (String.IsNullOrEmpty(name)) return null;
-            return gameModel.Players.FirstOrDefault(x => Common.Strings.NameEquals(x.Name, name));
+            if (string.IsNullOrEmpty(name)) return null;
+            return gameModel.Players.FirstOrDefault(x => Strings.NameEquals(x.Name, name));
         }
 
         #region ILogging support
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        NLog.Logger ILogging.Logger { get; } = logger;
+
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        Logger ILogging.Logger { get; } = logger;
+
         #endregion
     }
 }

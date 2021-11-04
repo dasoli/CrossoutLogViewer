@@ -1,9 +1,9 @@
-﻿using System;
+﻿using NLog;
 
 namespace CrossoutLogView.GUI.Core
 {
     internal interface ILogging
     {
-        internal NLog.Logger Logger { get; }
+        internal Logger Logger { get; }
     }
 }
